@@ -23,7 +23,7 @@ export default function Home() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center">
         <p className="mb-5 text-label uppercase text-white/80">Beauty studio</p>
-        <h1 className="font-display text-[clamp(4.2rem,18vw,9.5rem)] leading-[0.9] tracking-normal text-white drop-shadow-[0_8px_28px_rgba(0,0,0,0.35)]">
+        <h1 className="font-display text-[clamp(4.2rem,18vw,9.5rem)] leading-[0.9] tracking-normal text-[#f2e0c8] drop-shadow-[0_8px_28px_rgba(0,0,0,0.35)]">
           MOON STUDIO
         </h1>
         <p className="mt-7 max-w-3xl text-balance text-base font-medium uppercase leading-relaxed text-white/88 md:text-lg">
