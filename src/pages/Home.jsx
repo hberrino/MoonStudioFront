@@ -4,7 +4,7 @@ const heroPoster = "/images/moon-studio-lobby.jpg";
 export default function Home() {
   return (
     <section
-      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 py-28 text-center"
+      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-black bg-[url('/images/moon-studio-lobby.jpg')] bg-cover bg-center px-5 py-28 text-center"
       id="inicio"
     >
       <video
@@ -15,6 +15,7 @@ export default function Home() {
         muted
         playsInline
         poster={heroPoster}
+        preload="auto"
       >
         <source src={heroVideo} type="video/mp4" />
       </video>
