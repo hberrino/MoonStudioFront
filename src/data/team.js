@@ -1,7 +1,7 @@
 export const team = [
   {
     id: "valentina",
-    name: "Valentina Mora",
+    name: "Jazmin Roca",
     role: "Color y corte",
     bio: "Especialista en cambios suaves, cortes con movimiento y tratamientos que respetan la textura natural.",
     image:
@@ -9,7 +9,7 @@ export const team = [
   },
   {
     id: "camila",
-    name: "Camila Rios",
+    name: "Nombre y apellido",
     role: "Lashes y cejas",
     bio: "Disena miradas limpias y delicadas, con un enfoque natural para cada tipo de rostro.",
     image:
@@ -17,7 +17,7 @@ export const team = [
   },
   {
     id: "mia",
-    name: "Mia Duarte",
+    name: "Nombre y apellido",
     role: "Unas y detalle fino",
     bio: "Trabaja manicuras duraderas, formas precisas y disenos minimalistas con acabado pulido.",
     image:

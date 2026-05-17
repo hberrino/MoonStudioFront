@@ -3,7 +3,7 @@ export const services = [
     id: "hair",
     category: "Cabello",
     title: "Peluqueria",
-    professional: "Valentina Mora",
+    professional: "Jazmin Roca",
     description:
       "Cortes precisos, color suave y tratamientos reparadores pensados para devolverle movimiento y brillo al cabello.",
     image:
@@ -13,7 +13,7 @@ export const services = [
     id: "lashes",
     category: "Mirada",
     title: "Lashista",
-    professional: "Camila Rios",
+    professional: "Nombre y apellido",
     description:
       "Lifting, extensiones y perfilado sutil para una mirada definida, natural y luminosa.",
     image:
@@ -23,7 +23,7 @@ export const services = [
     id: "nails",
     category: "Manos y pies",
     title: "Unas esculpidas",
-    professional: "Mia Duarte",
+    professional: "Nombre y apellido",
     description:
       "Manicura, pedicura spa, esmaltado semipermanente y disenos elegantes con terminacion de estudio.",
     image:

@@ -38,7 +38,7 @@ export default function About() {
       <div className="mt-20 grid items-center gap-10 border-t border-outline-variant/50 pt-16 md:grid-cols-2">
         <div>
           <h3 className="font-display text-4xl text-primary md:text-5xl">
-            La filosofia del tacto
+          Ejemplo: La filosofia del tacto
           </h3>
           <p className="mt-5 text-lg leading-relaxed text-on-surface-variant">
             Creamos un espacio donde cada visita se sienta tranquila, cuidada y
