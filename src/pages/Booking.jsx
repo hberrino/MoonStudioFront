@@ -18,7 +18,7 @@ export default function Booking() {
             <img
               alt="Interior sereno de Moon Studio"
               className="h-full w-full object-cover opacity-90"
-              src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?q=80&w=1200&auto=format&fit=crop"
+              src="/images/ref5.jpg"
             />
           </div>
         </div>
