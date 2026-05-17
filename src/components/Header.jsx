@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navItems = [
   { label: "Inicio", href: "#inicio" },
@@ -9,9 +9,27 @@ const navItems = [
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    const updateHeaderVisibility = () => {
+      setHasScrolled(window.scrollY > 48);
+    };
+
+    updateHeaderVisibility();
+    window.addEventListener("scroll", updateHeaderVisibility, { passive: true });
+
+    return () => window.removeEventListener("scroll", updateHeaderVisibility);
+  }, []);
+
+  const isVisible = hasScrolled || isOpen;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-outline-variant/40 bg-background/82 shadow-lunar backdrop-blur-md">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 border-b border-outline-variant/40 bg-background/82 shadow-lunar backdrop-blur-md transition duration-500 ${
+        isVisible ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-full opacity-0"
+      }`}
+    >
       <div className="mx-auto flex max-w-container items-center justify-between px-5 py-4 md:px-16 md:py-6">
         <a
           className="font-display text-[1.7rem] leading-none tracking-normal text-primary md:text-3xl"
@@ -30,7 +48,7 @@ export default function Header() {
         </nav>
 
         <a
-          className="hidden rounded-full border border-primary bg-primary px-5 py-3 text-label uppercase text-white transition hover:border-[#4f4436] hover:bg-[#4f4436] hover:shadow-[0_10px_26px_rgba(80,69,52,0.18)] md:inline-flex"
+          className="hidden rounded-full border border-[#5b4f3f] bg-[#5b4f3f] px-5 py-3 text-label uppercase text-white transition hover:border-[#4f4436] hover:bg-[#4f4436] hover:shadow-[0_10px_26px_rgba(80,69,52,0.18)] md:inline-flex"
           href="#reservar"
         >
           Reservar turno

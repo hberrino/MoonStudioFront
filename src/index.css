@@ -68,6 +68,10 @@ textarea {
   transition: color 200ms ease, opacity 200ms ease;
 }
 
+.site-background {
+  background: #fbf9f4;
+}
+
 .nav-link::after {
   background: currentColor;
   bottom: 0;
@@ -184,6 +188,17 @@ textarea {
   background: #f5f3ee;
   border-color: #675a48;
   transform: translateY(-1px);
+}
+
+.button-secondary-on-dark {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.58);
+  color: white;
+}
+
+.button-secondary-on-dark:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: white;
 }
 
 .form-label {
