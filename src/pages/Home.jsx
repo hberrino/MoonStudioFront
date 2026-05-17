@@ -1,5 +1,4 @@
 const heroVideo = "/videos/moon-studio-hero.mp4";
-const heroPoster = "/images/moon-studio-lobby.jpg";
 
 export default function Home() {
   return (
@@ -14,7 +13,6 @@ export default function Home() {
         loop
         muted
         playsInline
-        poster={heroPoster}
       >
         <source src={heroVideo} type="video/mp4" />
       </video>
