@@ -140,12 +140,144 @@ textarea {
   font-weight: 400;
   line-height: 0.98;
   margin: 12px 0 22px;
+  position: relative;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85), 0 14px 30px rgba(103, 90, 72, 0.12);
+}
+
+.section-heading h2::after {
+  background: linear-gradient(90deg, transparent, rgba(103, 90, 72, 0.72), transparent);
+  bottom: -0.7rem;
+  content: "";
+  height: 1px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: min(220px, 72%);
 }
 
 .section-heading p:last-child {
   color: #4c463e;
   font-size: 1.06rem;
   line-height: 1.7;
+}
+
+.services-carousel {
+  border-radius: 0.75rem;
+  scrollbar-width: none;
+}
+
+.services-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.services-stage {
+  margin-inline: auto;
+  max-width: 1040px;
+  position: relative;
+}
+
+.service-slide {
+  flex: 0 0 100%;
+  min-height: 0;
+}
+
+.service-slide-media {
+  aspect-ratio: 4 / 3;
+  min-height: 260px;
+}
+
+.services-carousel h3 {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72), 0 12px 26px rgba(103, 90, 72, 0.12);
+}
+
+.carousel-button {
+  align-items: center;
+  background: rgba(103, 90, 72, 0.14);
+  border: 1px solid rgba(103, 90, 72, 0.42);
+  border-radius: 9999px;
+  color: #675a48;
+  cursor: pointer;
+  display: inline-grid;
+  font-size: 1.25rem;
+  height: 2.8rem;
+  justify-content: center;
+  line-height: 1;
+  place-items: center;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    color 200ms ease,
+    transform 200ms ease;
+  width: 2.8rem;
+}
+
+.carousel-button:hover {
+  background: #675a48;
+  border-color: #675a48;
+  box-shadow: 0 10px 24px rgba(103, 90, 72, 0.18);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.carousel-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.carousel-button:focus-visible {
+  outline: 2px solid rgba(103, 90, 72, 0.4);
+  outline-offset: 3px;
+}
+
+.carousel-button-left,
+.carousel-button-right {
+  display: none;
+}
+
+.carousel-mobile-controls {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .service-slide-media {
+    aspect-ratio: auto;
+    min-height: 400px;
+  }
+
+  .carousel-button-left,
+  .carousel-button-right {
+    display: inline-grid;
+    position: absolute;
+    top: 50%;
+    z-index: 5;
+  }
+
+  .carousel-button-left {
+    left: -1.4rem;
+    transform: translateY(-50%);
+  }
+
+  .carousel-button-right {
+    right: -1.4rem;
+    transform: translateY(-50%);
+  }
+
+  .carousel-button-left:hover,
+  .carousel-button-right:hover {
+    transform: translateY(calc(-50% - 1px));
+  }
+
+  .carousel-button-left:active,
+  .carousel-button-right:active {
+    transform: translateY(-50%) scale(0.98);
+  }
+
+  .carousel-mobile-controls {
+    display: none;
+  }
 }
 
 .arch-image {

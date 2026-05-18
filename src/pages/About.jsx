@@ -13,11 +13,10 @@ export default function About() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {team.map((person, index) => (
+        {team.map((person) => (
           <article
-            className="rounded-lg border border-outline-variant/40 bg-surface-container-low p-5 text-center shadow-halo transition duration-500 hover:-translate-y-1"
+            className="flex h-full flex-col rounded-lg border border-outline-variant/40 bg-surface-container-low p-5 text-center shadow-halo transition duration-500 hover:-translate-y-1"
             key={person.id}
-            style={{ marginTop: index ? `${index * 28}px` : undefined }}
           >
             <div className="arch-image mb-6 h-80 overflow-hidden bg-tertiary-fixed">
               <img
@@ -27,10 +26,13 @@ export default function About() {
               />
             </div>
             <h3 className="font-display text-3xl text-primary">{person.name}</h3>
-            <span className="mt-3 inline-flex rounded-full border border-secondary/20 bg-secondary/10 px-4 py-1 text-label uppercase text-secondary">
+            <span className="mt-3 inline-flex w-fit self-center rounded-full border border-secondary/20 bg-secondary/10 px-4 py-1 text-label uppercase text-secondary">
               {person.role}
             </span>
-            <p className="mt-4 leading-relaxed text-on-surface-variant">{person.bio}</p>
+            <p className="mt-4 flex-1 leading-relaxed text-on-surface-variant">{person.bio}</p>
+            <a className="button-primary mt-6 w-full" href="#reservar">
+              Conoceme
+            </a>
           </article>
         ))}
       </div>
