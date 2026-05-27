@@ -18,7 +18,7 @@ export default function Services() {
       left: slide.offsetLeft,
       behavior: "smooth",
     });
-  }, []);
+  }, [services.length]);
 
   const moveCarousel = useCallback((direction) => {
     goToService(currentIndexRef.current + direction);
@@ -62,8 +62,8 @@ export default function Services() {
         <p className="text-label uppercase text-tertiary">Servicios</p>
         <h2>Nuestros Servicios</h2>
         <p>
-          Una primera seleccion de experiencias para cabello, mirada y manos.
-          Luego podes cambiar nombres, fotos, precios o duraciones desde datos.
+          Una seleccion personalizada de experiencias para cabello, mirada y
+          manos.
         </p>
       </div>
 
