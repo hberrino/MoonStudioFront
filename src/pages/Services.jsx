@@ -79,9 +79,28 @@ export default function Services() {
           isPausedRef.current = true;
         }}
       >
+        <div className="services-mobile-controls">
+          <button
+            aria-label="Servicio anterior"
+            className="services-arrow services-arrow-mobile"
+            onClick={() => moveCarousel(-1)}
+            type="button"
+          >
+            {"<"}
+          </button>
+          <button
+            aria-label="Servicio siguiente"
+            className="services-arrow services-arrow-mobile"
+            onClick={() => moveCarousel(1)}
+            type="button"
+          >
+            {">"}
+          </button>
+        </div>
+
         <button
           aria-label="Servicio anterior"
-          className="carousel-button carousel-button-left"
+          className="services-arrow services-arrow-left"
           onClick={() => moveCarousel(-1)}
           type="button"
         >
@@ -100,26 +119,7 @@ export default function Services() {
 
         <button
           aria-label="Servicio siguiente"
-          className="carousel-button carousel-button-right"
-          onClick={() => moveCarousel(1)}
-          type="button"
-        >
-          {">"}
-        </button>
-      </div>
-
-      <div className="carousel-mobile-controls">
-        <button
-          aria-label="Servicio anterior"
-          className="carousel-button"
-          onClick={() => moveCarousel(-1)}
-          type="button"
-        >
-          {"<"}
-        </button>
-        <button
-          aria-label="Servicio siguiente"
-          className="carousel-button"
+          className="services-arrow services-arrow-right"
           onClick={() => moveCarousel(1)}
           type="button"
         >
@@ -152,14 +152,9 @@ function ServiceCard({ index, service }) {
           {service.description}
         </p>
         <div className="mt-8 flex flex-col gap-5 border-t border-outline-variant/50 pt-5">
-          <p className="text-label uppercase text-tertiary">
-            Profesional
-            <br />
-            {service.professional}
-          </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <a className="button-secondary w-full sm:w-fit" href="#nosotros">
-              Ver perfil
+              Ver profesional
             </a>
             <a className="button-primary w-full sm:w-fit" href="#reservar">
               Reservar cita

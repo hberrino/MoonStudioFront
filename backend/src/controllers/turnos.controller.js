@@ -6,6 +6,17 @@ import {
   findTurnoById,
   updateTurnoEstado,
 } from "../models/turno.model.js";
+import {
+  isValidClientName,
+  isValidDate,
+  isValidEmail,
+  isValidPhone,
+  isValidPositiveInteger,
+  isValidTime,
+  normalizeEmail,
+  normalizePhone,
+  sanitizeText,
+} from "../utils/validation.js";
 
 const estadosPermitidos = ["pendiente", "confirmado", "cancelado"];
 
@@ -44,27 +55,45 @@ export async function postTurno(req, res, next) {
       hora,
     } = req.body;
 
-    if (
-      !nombreCliente ||
-      !emailCliente ||
-      !telefonoCliente ||
-      !idProfesional ||
-      !idServicio ||
-      !fecha ||
-      !hora
-    ) {
-      return res.status(400).json({ message: "Missing required turno fields" });
+    const normalizedTurno = {
+      nombreCliente: sanitizeText(nombreCliente),
+      emailCliente: normalizeEmail(emailCliente),
+      telefonoCliente: normalizePhone(telefonoCliente),
+      idProfesional: Number(idProfesional),
+      idServicio: Number(idServicio),
+      fecha: sanitizeText(fecha),
+      hora: sanitizeText(hora).slice(0, 5),
+    };
+
+    if (!isValidClientName(normalizedTurno.nombreCliente)) {
+      return res.status(400).json({
+        message:
+          "Ingresa un nombre valido, sin numeros ni caracteres especiales.",
+      });
     }
 
-    const turno = await createTurno({
-      nombreCliente,
-      emailCliente,
-      telefonoCliente,
-      idProfesional,
-      idServicio,
-      fecha,
-      hora,
-    });
+    if (!isValidEmail(normalizedTurno.emailCliente)) {
+      return res.status(400).json({
+        message: "Ingresa un correo valido de Gmail, Hotmail, Outlook, Live, Yahoo o iCloud.",
+      });
+    }
+
+    if (!isValidPhone(normalizedTurno.telefonoCliente)) {
+      return res.status(400).json({
+        message: "Ingresa un telefono valido, solo numeros, entre 7 y 12 digitos.",
+      });
+    }
+
+    if (
+      !isValidPositiveInteger(normalizedTurno.idProfesional) ||
+      !isValidPositiveInteger(normalizedTurno.idServicio) ||
+      !isValidDate(normalizedTurno.fecha) ||
+      !isValidTime(normalizedTurno.hora)
+    ) {
+      return res.status(400).json({ message: "Los datos del turno no son validos." });
+    }
+
+    const turno = await createTurno(normalizedTurno);
 
     return res.status(201).json(turno);
   } catch (error) {

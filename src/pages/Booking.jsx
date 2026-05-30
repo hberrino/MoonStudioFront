@@ -8,9 +8,22 @@ const initialFormValues = {
   time: "",
 };
 
+const NAME_REGEX = /^[A-Za-zÀ-ÿÑñ\s]{2,80}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_REGEX = /^\d{7,12}$/;
+const ALLOWED_EMAIL_DOMAINS = new Set([
+  "gmail.com",
+  "hotmail.com",
+  "outlook.com",
+  "live.com",
+  "yahoo.com",
+  "icloud.com",
+]);
+
 export default function Booking() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formValues, setFormValues] = useState(initialFormValues);
+  const [formErrors, setFormErrors] = useState({});
   const [servicios, setServicios] = useState([]);
   const [profesionales, setProfesionales] = useState([]);
   const [serviciosPorProfesional, setServiciosPorProfesional] = useState({});
@@ -113,14 +126,21 @@ export default function Booking() {
   }, [selectedDate, selectedProfesional]);
 
   function updateField(name, value) {
+    const nextValue = sanitizeFieldValue(name, value);
+
     setFormValues((currentValues) => ({
       ...currentValues,
-      [name]: value,
+      [name]: nextValue,
+    }));
+
+    setFormErrors((currentErrors) => ({
+      ...currentErrors,
+      [name]: "",
     }));
   }
 
   function canGoToStepTwo() {
-    return formValues.name.trim() && formValues.email.trim() && formValues.phone.trim();
+    return Object.keys(validateClientData(formValues)).length === 0;
   }
 
   function canGoToStepThree() {
@@ -134,8 +154,16 @@ export default function Booking() {
   function goNext() {
     setStatus({ type: "", message: "" });
 
+    if (currentStep === 1) {
+      const nextErrors = validateClientData(formValues);
+      if (Object.keys(nextErrors).length > 0) {
+        setFormErrors(nextErrors);
+        setStatus({ type: "error", message: "Revisa tus datos para continuar." });
+        return;
+      }
+    }
+
     if (currentStep === 1 && !canGoToStepTwo()) {
-      setStatus({ type: "error", message: "Completa tus datos para continuar." });
       return;
     }
 
@@ -155,6 +183,14 @@ export default function Booking() {
   async function handleSubmit(event) {
     event.preventDefault();
 
+    const nextErrors = validateClientData(formValues);
+    if (Object.keys(nextErrors).length > 0) {
+      setFormErrors(nextErrors);
+      setCurrentStep(1);
+      setStatus({ type: "error", message: "Revisa tus datos para continuar." });
+      return;
+    }
+
     if (!canSubmit()) {
       setStatus({ type: "error", message: "Completa todos los datos del turno." });
       return;
@@ -165,9 +201,9 @@ export default function Booking() {
 
     try {
       await api.createTurno({
-        nombreCliente: formValues.name,
-        emailCliente: formValues.email,
-        telefonoCliente: formValues.phone,
+        nombreCliente: normalizeName(formValues.name),
+        emailCliente: normalizeEmail(formValues.email),
+        telefonoCliente: normalizePhone(formValues.phone),
         idProfesional: Number(selectedProfesional),
         idServicio: Number(selectedServicio),
         fecha: selectedDate,
@@ -175,6 +211,7 @@ export default function Booking() {
       });
 
       setFormValues(initialFormValues);
+      setFormErrors({});
       setSelectedServicio("");
       setSelectedProfesional("");
       setSelectedDate("");
@@ -216,6 +253,8 @@ export default function Booking() {
           {currentStep === 1 ? (
             <FormGroup title="Tus datos">
               <Field
+                autoComplete="name"
+                error={formErrors.name}
                 id="name"
                 label="Nombre completo"
                 onChange={(event) => updateField("name", event.target.value)}
@@ -225,17 +264,24 @@ export default function Booking() {
               />
               <div className="grid gap-6 md:grid-cols-2">
                 <Field
+                  autoComplete="email"
+                  error={formErrors.email}
                   id="email"
+                  inputMode="email"
                   label="Correo electronico"
                   onChange={(event) => updateField("email", event.target.value)}
-                  placeholder="correo@ejemplo.com"
+                  placeholder="correo@gmail.com"
                   required
                   type="email"
                   value={formValues.email}
                 />
                 <Field
+                  autoComplete="tel"
+                  error={formErrors.phone}
                   id="phone"
+                  inputMode="numeric"
                   label="Telefono"
+                  maxLength={12}
                   onChange={(event) => updateField("phone", event.target.value)}
                   placeholder="2494412345"
                   required
@@ -420,13 +466,30 @@ function FormGroup({ children, title }) {
   );
 }
 
-function Field({ id, label, onChange, placeholder, required, type = "text", value, variant }) {
+function Field({
+  autoComplete,
+  error,
+  id,
+  inputMode,
+  label,
+  maxLength,
+  onChange,
+  placeholder,
+  required,
+  type = "text",
+  value,
+  variant,
+}) {
   return (
     <label className="block">
       <span className="form-label">{label}</span>
       <input
+        aria-invalid={error ? "true" : "false"}
+        autoComplete={autoComplete}
         className={`form-input ${variant === "boxed" ? "form-input-boxed" : ""}`}
         id={id}
+        inputMode={inputMode}
+        maxLength={maxLength}
         name={id}
         onChange={onChange}
         placeholder={placeholder}
@@ -434,8 +497,50 @@ function Field({ id, label, onChange, placeholder, required, type = "text", valu
         type={type}
         value={value}
       />
+      {error ? <span className="field-error">{error}</span> : null}
     </label>
   );
+}
+
+function sanitizeFieldValue(name, value) {
+  if (name === "name") return value.replace(/[^A-Za-zÀ-ÿÑñ\s]/g, "").slice(0, 80);
+  if (name === "phone") return normalizePhone(value);
+  if (name === "email") return value.trim().toLowerCase().slice(0, 120);
+  return value;
+}
+
+function normalizeName(value) {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function normalizeEmail(value) {
+  return value.trim().toLowerCase();
+}
+
+function normalizePhone(value) {
+  return value.replace(/\D/g, "").slice(0, 12);
+}
+
+function validateClientData(values) {
+  const errors = {};
+  const name = normalizeName(values.name);
+  const email = normalizeEmail(values.email);
+  const phone = normalizePhone(values.phone);
+  const emailDomain = email.split("@")[1];
+
+  if (!NAME_REGEX.test(name)) {
+    errors.name = "Ingresa nombre y apellido, solo letras y espacios.";
+  }
+
+  if (!EMAIL_REGEX.test(email) || !ALLOWED_EMAIL_DOMAINS.has(emailDomain)) {
+    errors.email = "Usa un correo valido, por ejemplo Gmail, Hotmail u Outlook.";
+  }
+
+  if (!PHONE_REGEX.test(phone)) {
+    errors.phone = "Ingresa solo numeros, entre 7 y 12 digitos.";
+  }
+
+  return errors;
 }
 
 function buildDateOptions(totalDays) {

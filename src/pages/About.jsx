@@ -2,6 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { team } from "../data/team.js";
 
 const AUTO_SLIDE_MS = 2400;
+const spaceImages = [
+  "/images/espacio1.jpg",
+  "/images/espacio2.PNG",
+  "/images/espacio3.jpg",
+  "/images/espacio4.jpg",
+  "/images/espacio5.jpg",
+  "/images/espacio6.jpg",
+  "/images/espacio7.jpg",
+];
 
 function advanceCarousel(carousel) {
   if (!carousel) return;
@@ -18,8 +27,10 @@ function advanceCarousel(carousel) {
 
 export default function About() {
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [isSpaceModalOpen, setIsSpaceModalOpen] = useState(false);
   const teamCarouselRef = useRef(null);
   const workCarouselRef = useRef(null);
+  const spaceCarouselRef = useRef(null);
 
   const moveTeamCarousel = (direction) => {
     const carousel = teamCarouselRef.current;
@@ -41,8 +52,22 @@ export default function About() {
     });
   };
 
+  const moveSpaceCarousel = (direction) => {
+    const carousel = spaceCarouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollBy({
+      left: direction * carousel.clientWidth,
+      behavior: "smooth",
+    });
+  };
+
   const closeProfile = () => {
     setSelectedPerson(null);
+  };
+
+  const closeSpaceModal = () => {
+    setIsSpaceModalOpen(false);
   };
 
   useEffect(() => {
@@ -54,7 +79,7 @@ export default function About() {
   }, []);
 
   useEffect(() => {
-    if (!selectedPerson) return undefined;
+    if (!selectedPerson && !isSpaceModalOpen) return undefined;
 
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -62,6 +87,7 @@ export default function About() {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         closeProfile();
+        closeSpaceModal();
       }
     };
 
@@ -71,7 +97,7 @@ export default function About() {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedPerson]);
+  }, [selectedPerson, isSpaceModalOpen]);
 
   useEffect(() => {
     if (selectedPerson && workCarouselRef.current) {
@@ -89,6 +115,17 @@ export default function About() {
     return () => window.clearInterval(intervalId);
   }, [selectedPerson]);
 
+  useEffect(() => {
+    if (!isSpaceModalOpen) return undefined;
+
+    spaceCarouselRef.current?.scrollTo({ left: 0 });
+    const intervalId = window.setInterval(() => {
+      advanceCarousel(spaceCarouselRef.current);
+    }, AUTO_SLIDE_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [isSpaceModalOpen]);
+
   return (
     <section className="section-shell" id="nosotros">
       <div className="section-heading">
@@ -103,7 +140,7 @@ export default function About() {
       <div className="team-stage">
         <button
           aria-label="Ver profesionales anteriores"
-          className="carousel-button carousel-button-left"
+          className="team-arrow team-arrow-left"
           onClick={() => moveTeamCarousel(-1)}
           type="button"
         >
@@ -142,7 +179,7 @@ export default function About() {
         </div>
         <button
           aria-label="Ver mas profesionales"
-          className="carousel-button carousel-button-right"
+          className="team-arrow team-arrow-right"
           onClick={() => moveTeamCarousel(1)}
           type="button"
         >
@@ -263,28 +300,96 @@ export default function About() {
         </div>
       ) : null}
 
-      <div className="mt-20 grid items-center gap-10 border-t border-outline-variant/50 pt-16 md:grid-cols-2">
+      <div
+        className="mt-20 grid items-center gap-10 border-t border-outline-variant/50 pt-16 md:grid-cols-2"
+        id="espacio"
+      >
         <div>
-          <h3 className="font-display text-4xl text-primary md:text-5xl">
-          Ejemplo: La filosofia del tacto
-          </h3>
+          <div className="space-preview-copy">
+            <div className="space-preview-mark">
+              <span>Moon</span>
+              <strong>Studio</strong>
+            </div>
+            <h3>Conoce nuestro espacio</h3>
+          </div>
           <p className="mt-5 text-lg leading-relaxed text-on-surface-variant">
-            Creamos un espacio donde cada visita se sienta tranquila, cuidada y
-            simple. La tecnica importa, pero tambien importa como te sentis en
-            el proceso.
+            Creamos un espacio tranquilo, cuidado y calido, donde cada visita se
+            vive con calma. Porque la tecnica importa, pero tambien importa como
+            te sentis durante el proceso.
           </p>
-          <a className="mt-7 inline-flex border-b border-primary pb-1 text-label uppercase text-primary" href="#servicios">
-            Descubre nuestros servicios
-          </a>
+          <button
+            className="space-link-button mt-7"
+            onClick={() => setIsSpaceModalOpen(true)}
+            type="button"
+          >
+            {">>"} Ver estudio {"<<"}
+          </button>
         </div>
         <div className="h-80 overflow-hidden rounded-lg border border-outline-variant/40 bg-surface-container shadow-halo md:h-96">
           <img
             alt="Detalle del estudio"
             className="h-full w-full object-cover opacity-85"
-            src="https://images.unsplash.com/photo-1604014238170-4def1e4e6fcf?q=80&w=1400&auto=format&fit=crop"
+            src="/images/estudioprincipal.jpg"
           />
         </div>
       </div>
+
+      {isSpaceModalOpen ? (
+        <div
+          className="profile-modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeSpaceModal();
+            }
+          }}
+        >
+          <article
+            aria-labelledby="space-modal-title"
+            aria-modal="true"
+            className="space-modal"
+            role="dialog"
+          >
+            <button
+              aria-label="Cerrar estudio"
+              className="profile-modal-close"
+              onClick={closeSpaceModal}
+              type="button"
+            >
+              x
+            </button>
+            <div className="space-modal-copy">
+              <p className="text-label uppercase text-tertiary" id="space-modal-title">
+                Moon Studio
+              </p>
+            </div>
+            <div className="space-gallery-stage">
+              <button
+                aria-label="Ver foto anterior del estudio"
+                className="space-gallery-button space-gallery-button-left"
+                onClick={() => moveSpaceCarousel(-1)}
+                type="button"
+              >
+                {"<"}
+              </button>
+              <div className="space-gallery-carousel" ref={spaceCarouselRef}>
+                {spaceImages.map((image, index) => (
+                  <figure className="space-gallery-slide" key={image}>
+                    <img alt={`Espacio Moon Studio ${index + 1}`} src={image} />
+                  </figure>
+                ))}
+              </div>
+              <button
+                aria-label="Ver siguiente foto del estudio"
+                className="space-gallery-button space-gallery-button-right"
+                onClick={() => moveSpaceCarousel(1)}
+                type="button"
+              >
+                {">"}
+              </button>
+            </div>
+          </article>
+        </div>
+      ) : null}
     </section>
   );
 }

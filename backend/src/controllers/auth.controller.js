@@ -6,21 +6,23 @@ import { findUsuarioByNombre } from "../models/usuario.model.js";
 export async function login(req, res, next) {
   try {
     const { nombre, password } = req.body;
+    const normalizedNombre = String(nombre ?? "").trim();
+    const normalizedPassword = String(password ?? "");
 
-    if (!nombre || !password) {
-      return res.status(400).json({ message: "nombre and password are required" });
+    if (!normalizedNombre || !normalizedPassword || normalizedNombre.length > 80) {
+      return res.status(400).json({ message: "Usuario y password son requeridos." });
     }
 
-    const usuario = await findUsuarioByNombre(nombre);
+    const usuario = await findUsuarioByNombre(normalizedNombre);
 
     if (!usuario) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Credenciales invalidas." });
     }
 
-    const isValidPassword = await bcrypt.compare(password, usuario.password_hash);
+    const isValidPassword = await bcrypt.compare(normalizedPassword, usuario.password_hash);
 
     if (!isValidPassword) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Credenciales invalidas." });
     }
 
     const token = jwt.sign(

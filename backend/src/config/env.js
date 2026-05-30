@@ -5,6 +5,7 @@ dotenv.config();
 export const env = {
   port: Number(process.env.PORT) || 3001,
   jwtSecret: process.env.JWT_SECRET || "change_this_for_a_long_random_secret",
+  corsOrigin: process.env.CORS_ORIGIN || "*",
   admin: {
     name: process.env.ADMIN_NAME || "admin",
     password: process.env.ADMIN_PASSWORD || "",

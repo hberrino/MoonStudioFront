@@ -6,11 +6,12 @@ import disponibilidadRoutes from "./routes/disponibilidad.routes.js";
 import profesionalesRoutes from "./routes/profesionales.routes.js";
 import serviciosRoutes from "./routes/servicios.routes.js";
 import turnosRoutes from "./routes/turnos.routes.js";
+import { env } from "./config/env.js";
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({ origin: env.corsOrigin }));
+app.use(express.json({ limit: "20kb" }));
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
