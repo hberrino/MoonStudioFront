@@ -1,4 +1,4 @@
-const heroVideo = "/videos/moon-studio-hero.mp4";
+const heroVideo = "/videos/nuevaintro.mp4";
 
 export default function Home() {
   return (

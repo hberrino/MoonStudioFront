@@ -38,7 +38,7 @@ export default function Header() {
           href="#inicio"
           onClick={() => setIsOpen(false)}
         >
-          <img alt="Moon Studio" className="site-logo-img" src="/images/logoficial.png" />
+          <img alt="Moon Studio" className="site-logo-img" src="/images/logo/logoficial.png" />
         </a>
 
         <nav className="hidden items-center gap-8 md:flex md:justify-self-center">

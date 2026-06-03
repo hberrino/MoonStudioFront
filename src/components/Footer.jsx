@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="border-t border-outline-variant bg-surface-container-low">
       <div className="mx-auto grid max-w-container items-center gap-7 px-5 py-12 text-center md:grid-cols-[1fr_auto_1fr] md:px-16 md:py-16">
         <a aria-label="Moon Studio inicio" className="footer-logo-link" href="#inicio">
-          <img alt="Moon Studio" className="footer-logo-img" src="/images/logoficial.png" />
+          <img alt="Moon Studio" className="footer-logo-img" src="/images/logo/logoficial.png" />
         </a>
         <nav className="flex flex-wrap justify-center gap-x-7 gap-y-4 text-label uppercase text-on-secondary-fixed-variant">
           <a
@@ -16,7 +16,7 @@ export default function Footer() {
           </a>
           <a
             className="transition hover:text-primary"
-            href="https://maps.app.goo.gl/oRybTfXteHEyoXvG8"
+            href="https://maps.app.goo.gl/Q53sonYEGUteeBto8"
             rel="noreferrer"
             target="_blank"
           >

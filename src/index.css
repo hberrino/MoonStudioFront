@@ -604,6 +604,13 @@ summary:focus-visible {
   transform: translateX(3px);
 }
 
+.space-preview-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .space-preview-copy {
   align-items: end;
   display: grid;
@@ -648,6 +655,16 @@ summary:focus-visible {
 }
 
 @media (max-width: 520px) {
+  .space-preview-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .space-preview-actions .space-link-button {
+    margin-inline: 0;
+  }
+
   .space-preview-copy {
     align-items: start;
     gap: 0.85rem;

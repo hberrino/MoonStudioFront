@@ -3,13 +3,13 @@ import { team } from "../data/team.js";
 
 const AUTO_SLIDE_MS = 2400;
 const spaceImages = [
-  "/images/espacio1.jpg",
-  "/images/espacio2.PNG",
-  "/images/espacio3.jpg",
-  "/images/espacio4.jpg",
-  "/images/espacio5.jpg",
-  "/images/espacio6.jpg",
-  "/images/espacio7.jpg",
+  "/images/espacio/espacio1.jpg",
+  "/images/espacio/espacio2.PNG",
+  "/images/espacio/espacio3.jpg",
+  "/images/espacio/espacio4.jpg",
+  "/images/espacio/espacio5.jpg",
+  "/images/espacio/espacio6.jpg",
+  "/images/espacio/espacio7.jpg",
 ];
 
 function advanceCarousel(carousel) {
@@ -317,19 +317,29 @@ export default function About() {
             vive con calma. Porque la tecnica importa, pero tambien importa como
             te sentis durante el proceso.
           </p>
-          <button
-            className="space-link-button mt-7"
-            onClick={() => setIsSpaceModalOpen(true)}
-            type="button"
-          >
-            {">>"} Ver estudio {"<<"}
-          </button>
+          <div className="space-preview-actions mt-7">
+            <button
+              className="space-link-button"
+              onClick={() => setIsSpaceModalOpen(true)}
+              type="button"
+            >
+              {">>"} Ver estudio {"<<"}
+            </button>
+            <a
+              className="space-link-button"
+              href="https://maps.app.goo.gl/oRybTfXteHEyoXvG8"
+              rel="noreferrer"
+              target="_blank"
+            >
+              {">>"} Como llegar {"<<"}
+            </a>
+          </div>
         </div>
         <div className="h-80 overflow-hidden rounded-lg border border-outline-variant/40 bg-surface-container shadow-halo md:h-96">
           <img
             alt="Detalle del estudio"
             className="h-full w-full object-cover opacity-85"
-            src="/images/estudioprincipal.jpg"
+            src="/images/espacio/estudioprincipal.jpg"
           />
         </div>
       </div>
