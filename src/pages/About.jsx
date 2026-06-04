@@ -325,14 +325,6 @@ export default function About() {
             >
               {">>"} Ver estudio {"<<"}
             </button>
-            <a
-              className="space-link-button"
-              href="https://maps.app.goo.gl/oRybTfXteHEyoXvG8"
-              rel="noreferrer"
-              target="_blank"
-            >
-              {">>"} Como llegar {"<<"}
-            </a>
           </div>
         </div>
         <div className="h-80 overflow-hidden rounded-lg border border-outline-variant/40 bg-surface-container shadow-halo md:h-96">
