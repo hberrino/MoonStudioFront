@@ -1112,6 +1112,55 @@ summary:focus-visible {
   width: min(100%, 760px);
 }
 
+.booking-select-shell {
+  display: block;
+}
+
+.booking-service-select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #675a48 50%),
+    linear-gradient(135deg, #675a48 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.15rem) 50%,
+    calc(100% - 0.8rem) 50%;
+  background-repeat: no-repeat;
+  background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
+  cursor: pointer;
+  min-height: 3.25rem;
+  padding-right: 2.5rem;
+}
+
+.booking-service-summary {
+  align-items: center;
+  background: rgba(107, 92, 76, 0.08);
+  border: 1px solid rgba(103, 90, 72, 0.2);
+  border-radius: 0.5rem;
+  color: #4c463e;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+}
+
+.booking-service-summary span {
+  color: #675a48;
+  font-weight: 500;
+}
+
+.booking-service-summary strong {
+  color: #5b4f3f;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.booking-select-help {
+  color: #4c463e;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .booking-steps {
   display: grid;
   gap: 0.65rem;

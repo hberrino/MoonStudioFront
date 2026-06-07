@@ -35,6 +35,10 @@ export default function Booking() {
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dateOptions = useMemo(() => buildDateOptions(30), []);
+  const selectedServiceData = useMemo(
+    () => servicios.find((service) => String(service.id) === selectedServicio) || null,
+    [selectedServicio, servicios],
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -295,7 +299,39 @@ export default function Booking() {
           {currentStep === 2 ? (
             <>
               <FormGroup title="Servicio">
-                <div className="flex flex-wrap gap-3">
+                <label className="booking-select-shell">
+                  <span className="form-label">Servicio</span>
+                  <select
+                    className="form-input form-input-boxed booking-service-select"
+                    name="service-select"
+                    onChange={(event) => {
+                      setSelectedServicio(event.target.value);
+                      setSelectedProfesional("");
+                      setSelectedDate("");
+                      updateField("time", "");
+                    }}
+                    required
+                    value={selectedServicio}
+                  >
+                    <option value="">Selecciona un servicio</option>
+                    {servicios.map((service) => (
+                      <option key={service.id} value={service.id}>
+                        {formatServiceOption(service)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {selectedServiceData ? (
+                  <div className="booking-service-summary">
+                    <span>{selectedServiceData.nombre}</span>
+                    <strong>{formatServicePrice(selectedServiceData)}</strong>
+                  </div>
+                ) : (
+                  <p className="booking-select-help">
+                    Elegi primero el servicio para ver las profesionales disponibles.
+                  </p>
+                )}
+                <div className="hidden">
                   {servicios.map((service) => (
                     <label className="cursor-pointer" key={service.id}>
                       <input
@@ -541,6 +577,17 @@ function validateClientData(values) {
   }
 
   return errors;
+}
+
+function formatServiceOption(service) {
+  const price = formatServicePrice(service);
+  return price === "Precio a consultar" ? service.nombre : `${service.nombre} - ${price}`;
+}
+
+function formatServicePrice(service) {
+  return service.precio
+    ? `$${Number(service.precio).toLocaleString("es-AR")}`
+    : "Precio a consultar";
 }
 
 function buildDateOptions(totalDays) {
