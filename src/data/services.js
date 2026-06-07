@@ -6,8 +6,7 @@ export const services = [
     professional: "Jazmin Roca",
     description:
       "Cortes precisos, color suave y tratamientos reparadores pensados para devolverle movimiento y brillo al cabello.",
-    image:
-      "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1400&auto=format&fit=crop",
+    image: "/images/servicios/peluqueria.png",
   },
   {
     id: "lashes",

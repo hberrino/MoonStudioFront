@@ -21,7 +21,9 @@ export async function apiFetch(path, options = {}) {
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(data?.message || "No se pudo completar la solicitud");
+    const error = new Error(data?.message || "No se pudo completar la solicitud");
+    error.status = response.status;
+    throw error;
   }
 
   return data;

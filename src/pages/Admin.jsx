@@ -106,11 +106,11 @@ export default function Admin() {
     api
       .getDisponibilidadProfesional(availabilityForm.idProfesional)
       .then(setDisponibilidad)
-      .catch((requestError) => setError(requestError.message));
+      .catch(handleAdminRequestError);
     api
       .getBloqueosProfesional(availabilityForm.idProfesional)
       .then(setBloqueos)
-      .catch((requestError) => setError(requestError.message));
+      .catch(handleAdminRequestError);
   }, [availabilityForm.idProfesional, isLoggedIn]);
 
   async function handleLogin(event) {
@@ -123,7 +123,7 @@ export default function Admin() {
       setToken(data.token);
       setMessage("Sesion iniciada.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -132,6 +132,23 @@ export default function Admin() {
     setToken("");
     setTurnos([]);
     setMessage("");
+  }
+
+  function handleAdminRequestError(requestError) {
+    if (requestError.status === 401) {
+      localStorage.removeItem("moon_admin_token");
+      setToken("");
+      setTurnos([]);
+      setServicios([]);
+      setProfesionales([]);
+      setDisponibilidad([]);
+      setBloqueos([]);
+      setMessage("");
+      setError("Tu sesion vencio. Inicia sesion nuevamente.");
+      return;
+    }
+
+    setError(requestError.message);
   }
 
   async function handleEstadoChange(turnoId, estado) {
@@ -143,7 +160,7 @@ export default function Admin() {
       );
       setMessage("Estado actualizado.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -163,7 +180,7 @@ export default function Admin() {
       );
       setMessage("Precio actualizado.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -183,7 +200,7 @@ export default function Admin() {
       );
       setMessage("Servicio eliminado.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -208,7 +225,7 @@ export default function Admin() {
       setServiceForm(emptyServiceForm);
       setMessage("Servicio agregado y vinculado al profesional.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -222,7 +239,7 @@ export default function Admin() {
       setProfessionalForm(emptyProfessionalForm);
       setMessage("Profesional agregado.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -258,7 +275,7 @@ export default function Admin() {
       }
       setMessage("Profesional eliminado.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -277,7 +294,7 @@ export default function Admin() {
       );
       setMessage(`Turnos eliminados: ${result.deletedCount}.`);
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -306,7 +323,7 @@ export default function Admin() {
       });
       setMessage("Disponibilidad guardada.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -319,7 +336,7 @@ export default function Admin() {
       );
       setMessage("Disponibilidad eliminada.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -338,7 +355,7 @@ export default function Admin() {
       setBlockForm(emptyBlockForm);
       setMessage("Bloqueo guardado.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -349,7 +366,7 @@ export default function Admin() {
       setBloqueos((currentBloqueos) => currentBloqueos.filter((item) => item.id !== blockId));
       setMessage("Bloqueo eliminado.");
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
   }
 
@@ -407,7 +424,27 @@ export default function Admin() {
           </button>
         </header>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <label className="admin-tabs-select mt-6">
+          <span className="form-label">Seccion</span>
+          <select
+            className="form-input form-input-boxed"
+            onChange={(event) => {
+              if (event.target.value === "actualizar") {
+                refreshAdminData();
+                return;
+              }
+              setActiveTab(event.target.value);
+            }}
+            value={activeTab}
+          >
+            <option value="turnos">Turnos</option>
+            <option value="servicios">Servicios y precios</option>
+            <option value="disponibilidad">Disponibilidad</option>
+            <option value="actualizar">Actualizar datos</option>
+          </select>
+        </label>
+
+        <div className="admin-tabs mt-6">
           <button
             className={`admin-tab ${activeTab === "turnos" ? "admin-tab-active" : ""}`}
             onClick={() => setActiveTab("turnos")}
