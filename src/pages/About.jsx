@@ -1,15 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { team } from "../data/team.js";
 
-const AUTO_SLIDE_MS = 2400;
+const WORK_AUTO_SLIDE_MS = 3000;
+const SPACE_AUTO_SLIDE_MS = 2400;
+const TEAM_MOBILE_SLIDE_MS = 3000;
+const TEAM_SCROLL_SPEED = 28;
 const spaceImages = [
   "/images/espacio/espacio1.jpg",
-  "/images/espacio/espacio2.PNG",
+  "/images/espacio/espacio2.jpg",
   "/images/espacio/espacio3.jpg",
   "/images/espacio/espacio4.jpg",
   "/images/espacio/espacio5.jpg",
   "/images/espacio/espacio6.jpg",
   "/images/espacio/espacio7.jpg",
+  "/images/espacio/espacio8.jpg",
+  "/images/espacio/espacio9.jpg",
+  "/images/espacio/espacio10.jpg",
 ];
 
 function advanceCarousel(carousel) {
@@ -29,18 +35,12 @@ export default function About() {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [isSpaceModalOpen, setIsSpaceModalOpen] = useState(false);
   const teamCarouselRef = useRef(null);
+  const teamScrollPositionRef = useRef(0);
+  const teamMobileIndexRef = useRef(0);
+  const isTeamMobileRef = useRef(false);
+  const isTeamPausedRef = useRef(false);
   const workCarouselRef = useRef(null);
   const spaceCarouselRef = useRef(null);
-
-  const moveTeamCarousel = (direction) => {
-    const carousel = teamCarouselRef.current;
-    if (!carousel) return;
-
-    carousel.scrollBy({
-      left: direction * carousel.clientWidth,
-      behavior: "smooth",
-    });
-  };
 
   const moveWorkCarousel = (direction) => {
     const carousel = workCarouselRef.current;
@@ -50,6 +50,18 @@ export default function About() {
       left: direction * carousel.clientWidth,
       behavior: "smooth",
     });
+  };
+
+  const moveTeamMobile = (direction) => {
+    const carousel = teamCarouselRef.current;
+    if (!carousel) return;
+
+    const nextIndex = (teamMobileIndexRef.current + direction + team.length) % team.length;
+    const slide = carousel.querySelector(`[data-team-index="${nextIndex}"]`);
+    if (!slide) return;
+
+    teamMobileIndexRef.current = nextIndex;
+    carousel.scrollTo({ left: slide.offsetLeft, behavior: "smooth" });
   };
 
   const moveSpaceCarousel = (direction) => {
@@ -71,9 +83,59 @@ export default function About() {
   };
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return undefined;
+
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    const updateMode = () => {
+      isTeamMobileRef.current = mobileQuery.matches;
+    };
+
+    updateMode();
+    mobileQuery.addEventListener("change", updateMode);
+
+    let animationFrameId;
+    let previousTime = performance.now();
+
+    const moveContinuously = (currentTime) => {
+      const carousel = teamCarouselRef.current;
+      const elapsed = Math.min(currentTime - previousTime, 50);
+      previousTime = currentTime;
+
+      if (
+        carousel &&
+        carousel.scrollWidth > carousel.clientWidth &&
+        !isTeamMobileRef.current &&
+        !isTeamPausedRef.current
+      ) {
+        const firstDuplicate = carousel.querySelector('[data-team-copy="true"]');
+        const loopPoint = firstDuplicate?.offsetLeft || carousel.scrollWidth / 2;
+        teamScrollPositionRef.current += (TEAM_SCROLL_SPEED * elapsed) / 1000;
+
+        if (teamScrollPositionRef.current >= loopPoint) {
+          teamScrollPositionRef.current -= loopPoint;
+        }
+
+        carousel.scrollLeft = teamScrollPositionRef.current;
+      }
+
+      animationFrameId = window.requestAnimationFrame(moveContinuously);
+    };
+
+    animationFrameId = window.requestAnimationFrame(moveContinuously);
+
+    return () => {
+      mobileQuery.removeEventListener("change", updateMode);
+      window.cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  useEffect(() => {
     const intervalId = window.setInterval(() => {
-      advanceCarousel(teamCarouselRef.current);
-    }, AUTO_SLIDE_MS);
+      if (isTeamMobileRef.current && !isTeamPausedRef.current) {
+        moveTeamMobile(1);
+      }
+    }, TEAM_MOBILE_SLIDE_MS);
 
     return () => window.clearInterval(intervalId);
   }, []);
@@ -110,7 +172,7 @@ export default function About() {
 
     const intervalId = window.setInterval(() => {
       advanceCarousel(workCarouselRef.current);
-    }, AUTO_SLIDE_MS);
+    }, WORK_AUTO_SLIDE_MS);
 
     return () => window.clearInterval(intervalId);
   }, [selectedPerson]);
@@ -121,14 +183,14 @@ export default function About() {
     spaceCarouselRef.current?.scrollTo({ left: 0 });
     const intervalId = window.setInterval(() => {
       advanceCarousel(spaceCarouselRef.current);
-    }, AUTO_SLIDE_MS);
+    }, SPACE_AUTO_SLIDE_MS);
 
     return () => window.clearInterval(intervalId);
   }, [isSpaceModalOpen]);
 
   return (
     <section className="section-shell" id="nosotros">
-      <div className="section-heading">
+      <div className="section-heading" data-reveal>
         <p className="text-label uppercase text-tertiary">Nosotros</p>
         <h2>El equipo Moon</h2>
         <p>
@@ -137,23 +199,66 @@ export default function About() {
         </p>
       </div>
 
-      <div className="team-stage">
-        <button
-          aria-label="Ver profesionales anteriores"
-          className="team-arrow team-arrow-left"
-          onClick={() => moveTeamCarousel(-1)}
-          type="button"
-        >
-          {"<"}
-        </button>
+      <div
+        className="team-stage"
+        data-reveal
+        data-reveal-delay="1"
+        onBlurCapture={() => {
+          isTeamPausedRef.current = false;
+        }}
+        onFocusCapture={() => {
+          isTeamPausedRef.current = true;
+        }}
+        onMouseEnter={() => {
+          isTeamPausedRef.current = true;
+        }}
+        onMouseLeave={() => {
+          isTeamPausedRef.current = false;
+        }}
+        onTouchCancel={() => {
+          isTeamPausedRef.current = false;
+        }}
+        onTouchEnd={() => {
+          isTeamPausedRef.current = false;
+        }}
+        onTouchStart={() => {
+          isTeamPausedRef.current = true;
+        }}
+      >
         <div
-          className="team-carousel flex gap-5 overflow-x-auto scroll-smooth"
+          className="team-carousel flex gap-5 overflow-x-auto"
+          onScroll={(event) => {
+            if (isTeamMobileRef.current) {
+              const carousel = event.currentTarget;
+              const originalSlides = Array.from(
+                carousel.querySelectorAll('[data-team-copy="false"]'),
+              );
+              const closestSlide = originalSlides.reduce((closest, slide) =>
+                Math.abs(slide.offsetLeft - carousel.scrollLeft) <
+                Math.abs(closest.offsetLeft - carousel.scrollLeft)
+                  ? slide
+                  : closest,
+              originalSlides[0]);
+
+              if (closestSlide) {
+                teamMobileIndexRef.current = Number(closestSlide.dataset.teamIndex);
+              }
+            } else if (isTeamPausedRef.current) {
+              teamScrollPositionRef.current = event.currentTarget.scrollLeft;
+            }
+          }}
           ref={teamCarouselRef}
         >
-          {team.map((person) => (
+          {[...team, ...team].map((person, index) => {
+            const isDuplicate = index >= team.length;
+
+            return (
             <article
+              aria-hidden={isDuplicate ? "true" : undefined}
               className="team-slide flex h-full flex-col rounded-lg border border-outline-variant/40 bg-surface-container-low p-5 text-center shadow-halo transition duration-500 hover:-translate-y-1"
-              key={person.id}
+              data-team-copy={isDuplicate ? "true" : "false"}
+              data-team-index={index % team.length}
+              key={`${person.id}-${isDuplicate ? "copy" : "original"}`}
             >
               <div className="arch-image mb-6 h-80 overflow-hidden bg-tertiary-fixed">
                 <img
@@ -170,26 +275,20 @@ export default function About() {
               <button
                 className="button-primary mt-6 w-full"
                 onClick={() => setSelectedPerson(person)}
+                tabIndex={isDuplicate ? -1 : undefined}
                 type="button"
               >
                 Ver perfil
               </button>
             </article>
-          ))}
+            );
+          })}
         </div>
-        <button
-          aria-label="Ver mas profesionales"
-          className="team-arrow team-arrow-right"
-          onClick={() => moveTeamCarousel(1)}
-          type="button"
-        >
-          {">"}
-        </button>
-        <div className="carousel-mobile-controls">
+        <div className="team-mobile-controls">
           <button
             aria-label="Ver profesional anterior"
             className="carousel-button"
-            onClick={() => moveTeamCarousel(-1)}
+            onClick={() => moveTeamMobile(-1)}
             type="button"
           >
             {"<"}
@@ -197,7 +296,7 @@ export default function About() {
           <button
             aria-label="Ver siguiente profesional"
             className="carousel-button"
-            onClick={() => moveTeamCarousel(1)}
+            onClick={() => moveTeamMobile(1)}
             type="button"
           >
             {">"}
@@ -302,6 +401,7 @@ export default function About() {
 
       <div
         className="mt-20 grid items-center gap-10 border-t border-outline-variant/50 pt-16 md:grid-cols-2"
+        data-reveal
         id="espacio"
       >
         <div>
@@ -389,6 +489,14 @@ export default function About() {
                 {">"}
               </button>
             </div>
+            <a
+              className="space-maps-link"
+              href="https://maps.app.goo.gl/AZtYP6Tehpoy4RqC7"
+              rel="noreferrer"
+              target="_blank"
+            >
+              {">>"} Ver en Google Maps {"<<"}
+            </a>
           </article>
         </div>
       ) : null}

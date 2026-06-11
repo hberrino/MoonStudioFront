@@ -3,29 +3,40 @@ export const services = [
     id: "hair",
     category: "Cabello",
     title: "Peluqueria",
-    professional: "Jazmin Roca",
     description:
-      "Cortes precisos, color suave y tratamientos reparadores pensados para devolverle movimiento y brillo al cabello.",
-    image: "/images/servicios/peluqueria.png",
+      "Cortes, color y tratamientos pensados para cuidar el cabello y darle movimiento, brillo y personalidad.",
+    image: "/images/servicios/servicio_peluqueria.jpg",
   },
   {
     id: "lashes",
     category: "Mirada",
-    title: "Lashista",
-    professional: "Nombre y apellido",
+    title: "Pestañas",
     description:
-      "Lifting, extensiones y perfilado sutil para una mirada definida, natural y luminosa.",
-    image:
-      "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?q=80&w=1200&auto=format&fit=crop",
+      "Extensiones y lifting de pestañas con resultados personalizados que realzan la mirada de forma delicada.",
+    image: "/images/servicios/servicio_pestania.jpg",
   },
   {
-    id: "nails",
-    category: "Manos y pies",
-    title: "Unas esculpidas",
-    professional: "Nombre y apellido",
+    id: "hands",
+    category: "Manos",
+    title: "Uñas",
     description:
-      "Manicura, pedicura spa, esmaltado semipermanente y disenos elegantes con terminacion de estudio.",
-    image:
-      "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=1400&auto=format&fit=crop",
+      "Manicura, semipermanente, capping y Soft Gel con terminaciones cuidadas, resistentes y personalizadas.",
+    image: "/images/servicios/servicio_unia.jpg",
+  },
+  {
+    id: "brows",
+    category: "Mirada",
+    title: "Cejas",
+    description:
+      "Perfilado de cejas adaptado a cada rostro para lograr una expresion armoniosa, natural y definida.",
+    image: "/images/servicios/servicio_ceja.jpg",
+  },
+  {
+    id: "feet",
+    category: "Pies",
+    title: "Pedicura y cuidado",
+    description:
+      "Pedicura y cuidado integral para mantener los pies prolijos, suaves y saludables en cada visita.",
+    image: "/images/servicios/servicio_pie.jpg",
   },
 ];

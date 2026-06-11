@@ -237,13 +237,13 @@ export default function Booking() {
 
   return (
     <section className="section-shell" id="reservar">
-      <div className="section-heading">
+      <div className="section-heading" data-reveal>
         <p className="text-label uppercase text-tertiary">Reservar turno</p>
         <h2>Agenda tu cita</h2>
         <p>Reserva tu turno en 3 simples pasos.</p>
       </div>
 
-      <div className="booking-form-wrap">
+      <div className="booking-form-wrap" data-reveal data-reveal-delay="1">
         <form
           className="booking-form-card rounded-lg border border-outline-variant/30 bg-surface-bright/70 p-6 shadow-halo backdrop-blur-sm md:p-10"
           onSubmit={handleSubmit}
