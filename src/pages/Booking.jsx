@@ -54,7 +54,7 @@ export default function Booking() {
             try {
               const professionalServices = await api.getProfesionalServicios(professional.id);
               return [professional.id, professionalServices.map((service) => String(service.id))];
-            } catch (_error) {
+            } catch {
               return [professional.id, []];
             }
           }),
@@ -65,7 +65,7 @@ export default function Booking() {
         setServicios(nextServicios);
         setProfesionales(nextProfesionales);
         setServiciosPorProfesional(Object.fromEntries(serviceEntries));
-      } catch (_error) {
+      } catch {
         if (!isMounted) return;
         setStatus({
           type: "error",
@@ -99,7 +99,6 @@ export default function Booking() {
     let isMounted = true;
 
     if (!selectedProfesional || !selectedDate) {
-      setHorariosDisponibles([]);
       return undefined;
     }
 
@@ -111,7 +110,7 @@ export default function Booking() {
         if (isMounted) {
           setHorariosDisponibles(horarios);
         }
-      } catch (_error) {
+      } catch {
         if (isMounted) {
           setHorariosDisponibles([]);
         }
@@ -128,6 +127,8 @@ export default function Booking() {
       isMounted = false;
     };
   }, [selectedDate, selectedProfesional]);
+
+  const visibleHorarios = selectedProfesional && selectedDate ? horariosDisponibles : [];
 
   function updateField(name, value) {
     const nextValue = sanitizeFieldValue(name, value);
@@ -427,7 +428,7 @@ export default function Booking() {
                         selectedProfesional,
                       })}
                     </option>
-                    {horariosDisponibles.map((time) => (
+                    {visibleHorarios.map((time) => (
                       <option key={time} value={time}>
                         {time}
                       </option>
@@ -435,7 +436,7 @@ export default function Booking() {
                   </select>
                 </label>
               </div>
-              {selectedDate && !isLoadingHorarios && horariosDisponibles.length === 0 ? (
+              {selectedDate && !isLoadingHorarios && visibleHorarios.length === 0 ? (
                 <p className="text-sm leading-relaxed text-on-surface-variant">
                   Sin disponibilidad para ese dia.
                 </p>

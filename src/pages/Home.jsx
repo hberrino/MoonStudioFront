@@ -13,6 +13,8 @@ export default function Home() {
         loop
         muted
         playsInline
+        poster="/images/logo/moon-studio-hero.jpg"
+        preload="metadata"
       >
         <source src={heroVideo} type="video/mp4" />
       </video>

@@ -264,6 +264,8 @@ export default function About() {
                 <img
                   alt={`Retrato de ${person.name}`}
                   className="h-full w-full object-cover opacity-90 mix-blend-multiply"
+                  decoding="async"
+                  loading="lazy"
                   src={person.image}
                 />
               </div>
@@ -351,6 +353,8 @@ export default function About() {
                     <figure className="profile-work-slide" key={`${selectedPerson.id}-${image}`}>
                       <img
                         alt={`Trabajo ${index + 1} de ${selectedPerson.name}`}
+                        decoding="async"
+                        loading="lazy"
                         src={image}
                       />
                     </figure>
@@ -431,6 +435,8 @@ export default function About() {
           <img
             alt="Detalle del estudio"
             className="h-full w-full object-cover opacity-85"
+            decoding="async"
+            loading="lazy"
             src="/images/espacio/estudioprincipal.jpg"
           />
         </div>
@@ -476,7 +482,12 @@ export default function About() {
               <div className="space-gallery-carousel" ref={spaceCarouselRef}>
                 {spaceImages.map((image, index) => (
                   <figure className="space-gallery-slide" key={image}>
-                    <img alt={`Espacio Moon Studio ${index + 1}`} src={image} />
+                    <img
+                      alt={`Espacio Moon Studio ${index + 1}`}
+                      decoding="async"
+                      loading="lazy"
+                      src={image}
+                    />
                   </figure>
                 ))}
               </div>

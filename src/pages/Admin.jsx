@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api.js";
 
 const emptyServiceForm = { nombre: "", precio: "", idProfesional: "" };
@@ -74,12 +74,7 @@ export default function Admin() {
     return [...filteredTurnos].sort(compareTurnosForAgenda);
   }, [turnos, turnosProfessionalFilter, turnosTimeFilter]);
 
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    refreshAdminData();
-  }, [isLoggedIn]);
-
-  async function refreshAdminData() {
+  const refreshAdminData = useCallback(async () => {
     try {
       setError("");
       const [nextTurnos, nextServicios, nextProfesionales] = await Promise.all([
@@ -91,14 +86,17 @@ export default function Admin() {
       setServicios(nextServicios);
       setProfesionales(nextProfesionales);
 
-      if (!availabilityForm.idProfesional) {
-        setDisponibilidad([]);
-        setBloqueos([]);
-      }
     } catch (requestError) {
       setError(requestError.message);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const timeoutId = window.setTimeout(refreshAdminData, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isLoggedIn, refreshAdminData]);
 
   useEffect(() => {
     if (!isLoggedIn || !availabilityForm.idProfesional) return;

@@ -143,6 +143,8 @@ function ServiceCard({ index, service }) {
         <img
           alt={service.title}
           className="service-slide-image"
+          decoding="async"
+          loading="lazy"
           src={service.image}
         />
       </div>
