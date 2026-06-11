@@ -6,7 +6,7 @@ export const team = [
     name: "Jazmin Roca",
     profession: "Estilista",
     role: "Color, corte y estilo",
-    bio: "Estilista especializada en cortes y color personalizados que potencian la identidad y el estilo de cada persona. Trabaja cada detalle con técnica y cuidado para lograr resultados naturales, armoniosos y fáciles de mantener.",
+    bio: "Estilista especializada en cortes y color personalizados que potencian la identidad y el estilo de cada persona.",
     image: "/images/profesionales/trabajos/Jazmin/perfil.jpg",
     instagram: "https://www.instagram.com/",
     workImages: [
