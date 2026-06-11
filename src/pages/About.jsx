@@ -34,6 +34,7 @@ function advanceCarousel(carousel) {
 export default function About() {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [isSpaceModalOpen, setIsSpaceModalOpen] = useState(false);
+  const [spaceModalView, setSpaceModalView] = useState("studio");
   const teamCarouselRef = useRef(null);
   const teamScrollPositionRef = useRef(0);
   const teamMobileIndexRef = useRef(0);
@@ -424,19 +425,24 @@ export default function About() {
           <div className="space-preview-actions mt-7">
             <button
               className="space-link-button"
-              onClick={() => setIsSpaceModalOpen(true)}
+              onClick={() => {
+                setSpaceModalView("studio");
+                setIsSpaceModalOpen(true);
+              }}
               type="button"
             >
               {">>"} Ver estudio {"<<"}
             </button>
-            <a
+            <button
               className="space-link-button space-mobile-directions"
-              href="https://maps.app.goo.gl/AZtYP6Tehpoy4RqC7"
-              rel="noreferrer"
-              target="_blank"
+              onClick={() => {
+                setSpaceModalView("map");
+                setIsSpaceModalOpen(true);
+              }}
+              type="button"
             >
               {">>"} Como llegar {"<<"}
-            </a>
+            </button>
           </div>
         </div>
         <div className="h-80 overflow-hidden rounded-lg border border-outline-variant/40 bg-surface-container shadow-halo md:h-96">
@@ -463,6 +469,7 @@ export default function About() {
             aria-labelledby="space-modal-title"
             aria-modal="true"
             className="space-modal"
+            data-space-view={spaceModalView}
             role="dialog"
           >
             <button

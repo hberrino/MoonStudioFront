@@ -1010,6 +1010,24 @@ summary:focus-visible {
     font-size: clamp(1.8rem, 9vw, 2.35rem);
   }
 
+  .space-modal-content {
+    display: block;
+  }
+
+  .space-modal[data-space-view="studio"] .space-map-panel,
+  .space-modal[data-space-view="map"] .space-gallery-stage {
+    display: none;
+  }
+
+  .space-modal[data-space-view="map"] .space-map-panel {
+    margin-inline: auto;
+    max-width: 22rem;
+  }
+
+  .space-modal[data-space-view="map"] .space-map-preview img {
+    aspect-ratio: 4 / 3;
+  }
+
   .space-gallery-stage,
   .space-map-preview {
     padding: 0.2rem;
