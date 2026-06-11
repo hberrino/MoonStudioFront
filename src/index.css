@@ -733,6 +733,38 @@ summary:focus-visible {
 }
 
 @media (max-width: 520px) {
+  .hero-content {
+    max-width: 22rem;
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 0.85rem;
+  }
+
+  .hero-title {
+    font-size: clamp(3.25rem, 15vw, 3.85rem);
+    line-height: 0.92;
+  }
+
+  .hero-description {
+    font-size: 0.8rem;
+    line-height: 1.55;
+    margin-top: 1.15rem;
+    max-width: 19rem;
+  }
+
+  .hero-actions {
+    gap: 0.65rem;
+    margin-top: 1.65rem;
+    max-width: 17rem;
+  }
+
+  .hero-actions .button-primary,
+  .hero-actions .button-secondary {
+    min-height: 2.8rem;
+    padding-block: 0.78rem;
+  }
+
   .space-preview-actions {
     align-items: center;
     flex-direction: row;

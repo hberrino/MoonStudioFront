@@ -21,16 +21,16 @@ export default function Home() {
       <div className="absolute inset-0 bg-black/48" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_34%),linear-gradient(180deg,rgba(0,0,0,0.2),rgba(0,0,0,0.58))]" />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center">
-        <p className="mb-5 text-label uppercase text-white/80">Beauty studio</p>
-        <h1 className="font-display text-[clamp(4.2rem,18vw,9.5rem)] leading-[0.9] tracking-normal text-[#f2e0c8] drop-shadow-[0_8px_28px_rgba(0,0,0,0.35)]">
+      <div className="hero-content relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center">
+        <p className="hero-eyebrow mb-5 text-label uppercase text-white/80">Beauty studio</p>
+        <h1 className="hero-title font-display text-[clamp(4.2rem,18vw,9.5rem)] leading-[0.9] tracking-normal text-[#f2e0c8] drop-shadow-[0_8px_28px_rgba(0,0,0,0.35)]">
           MOON STUDIO
         </h1>
-        <p className="mt-7 max-w-3xl text-balance text-base font-medium uppercase leading-relaxed text-white/88 md:text-lg">
+        <p className="hero-description mt-7 max-w-3xl text-balance text-base font-medium uppercase leading-relaxed text-white/88 md:text-lg">
           Un espacio de belleza serena, detalle fino y rituales pensados para
           bajar el ritmo desde que entras.
         </p>
-        <div className="mt-10 flex w-full max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
+        <div className="hero-actions mt-10 flex w-full max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
           <a className="button-primary" href="#reservar">
             Reservar turnos
           </a>
