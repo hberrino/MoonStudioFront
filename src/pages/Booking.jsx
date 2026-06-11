@@ -29,6 +29,7 @@ export default function Booking() {
   const [serviciosPorProfesional, setServiciosPorProfesional] = useState({});
   const [selectedServicio, setSelectedServicio] = useState("");
   const [selectedProfesional, setSelectedProfesional] = useState("");
+  const [acceptsProfessionalContact, setAcceptsProfessionalContact] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
   const [isLoadingHorarios, setIsLoadingHorarios] = useState(false);
@@ -149,7 +150,7 @@ export default function Booking() {
   }
 
   function canGoToStepThree() {
-    return selectedServicio && selectedProfesional;
+    return selectedServicio && selectedProfesional && acceptsProfessionalContact;
   }
 
   function canSubmit() {
@@ -173,7 +174,10 @@ export default function Booking() {
     }
 
     if (currentStep === 2 && !canGoToStepThree()) {
-      setStatus({ type: "error", message: "Selecciona servicio y profesional para continuar." });
+      setStatus({
+        type: "error",
+        message: "Selecciona servicio, profesional y acepta el contacto para continuar.",
+      });
       return;
     }
 
@@ -219,12 +223,14 @@ export default function Booking() {
       setFormErrors({});
       setSelectedServicio("");
       setSelectedProfesional("");
+      setAcceptsProfessionalContact(false);
       setSelectedDate("");
       setHorariosDisponibles([]);
       setCurrentStep(1);
       setStatus({
         type: "success",
-        message: "Tu turno fue solicitado correctamente.",
+        message:
+          "Turno agendado exitosamente. De requerir una atención especial o personalizada, podrás compartir los detalles con la profesional cuando se comunique.",
       });
     } catch (error) {
       setStatus({
@@ -384,6 +390,22 @@ export default function Booking() {
                   </select>
                 </label>
               </FormGroup>
+
+              <label className="booking-contact-consent">
+                <input
+                  checked={acceptsProfessionalContact}
+                  onChange={(event) => {
+                    setAcceptsProfessionalContact(event.target.checked);
+                    setStatus({ type: "", message: "" });
+                  }}
+                  required
+                  type="checkbox"
+                />
+                <span>
+                  Acepto que, si fuera necesario, la profesional se comunique conmigo para
+                  personalizar mi experiencia.
+                </span>
+              </label>
             </>
           ) : null}
 

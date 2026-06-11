@@ -429,6 +429,14 @@ export default function About() {
             >
               {">>"} Ver estudio {"<<"}
             </button>
+            <a
+              className="space-link-button space-mobile-directions"
+              href="https://maps.app.goo.gl/AZtYP6Tehpoy4RqC7"
+              rel="noreferrer"
+              target="_blank"
+            >
+              {">>"} Como llegar {"<<"}
+            </a>
           </div>
         </div>
         <div className="h-80 overflow-hidden rounded-lg border border-outline-variant/40 bg-surface-container shadow-halo md:h-96">
@@ -470,44 +478,63 @@ export default function About() {
                 Moon Studio
               </p>
             </div>
-            <div className="space-gallery-stage">
-              <button
-                aria-label="Ver foto anterior del estudio"
-                className="space-gallery-button space-gallery-button-left"
-                onClick={() => moveSpaceCarousel(-1)}
-                type="button"
-              >
-                {"<"}
-              </button>
-              <div className="space-gallery-carousel" ref={spaceCarouselRef}>
-                {spaceImages.map((image, index) => (
-                  <figure className="space-gallery-slide" key={image}>
-                    <img
-                      alt={`Espacio Moon Studio ${index + 1}`}
-                      decoding="async"
-                      loading="lazy"
-                      src={image}
-                    />
-                  </figure>
-                ))}
+            <div className="space-modal-content">
+              <div className="space-gallery-stage">
+                <button
+                  aria-label="Ver foto anterior del estudio"
+                  className="space-gallery-button space-gallery-button-left"
+                  onClick={() => moveSpaceCarousel(-1)}
+                  type="button"
+                >
+                  {"<"}
+                </button>
+                <div className="space-gallery-carousel" ref={spaceCarouselRef}>
+                  {spaceImages.map((image, index) => (
+                    <figure className="space-gallery-slide" key={image}>
+                      <img
+                        alt={`Espacio Moon Studio ${index + 1}`}
+                        decoding="async"
+                        loading="lazy"
+                        src={image}
+                      />
+                    </figure>
+                  ))}
+                </div>
+                <button
+                  aria-label="Ver siguiente foto del estudio"
+                  className="space-gallery-button space-gallery-button-right"
+                  onClick={() => moveSpaceCarousel(1)}
+                  type="button"
+                >
+                  {">"}
+                </button>
               </div>
-              <button
-                aria-label="Ver siguiente foto del estudio"
-                className="space-gallery-button space-gallery-button-right"
-                onClick={() => moveSpaceCarousel(1)}
-                type="button"
-              >
-                {">"}
-              </button>
+
+              <div className="space-map-panel">
+                <a
+                  aria-label="Abrir ubicación de Moon Studio en Google Maps"
+                  className="space-map-preview"
+                  href="https://maps.app.goo.gl/AZtYP6Tehpoy4RqC7"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <img
+                    alt="Mapa de ubicación de Moon Studio"
+                    decoding="async"
+                    loading="lazy"
+                    src="/images/espacio/map.jpg"
+                  />
+                </a>
+                <a
+                  className="space-maps-link"
+                  href="https://maps.app.goo.gl/AZtYP6Tehpoy4RqC7"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  {">>"} Ver en Google Maps {"<<"}
+                </a>
+              </div>
             </div>
-            <a
-              className="space-maps-link"
-              href="https://maps.app.goo.gl/AZtYP6Tehpoy4RqC7"
-              rel="noreferrer"
-              target="_blank"
-            >
-              {">>"} Ver en Google Maps {"<<"}
-            </a>
           </article>
         </div>
       ) : null}
