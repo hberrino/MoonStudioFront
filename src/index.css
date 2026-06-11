@@ -877,7 +877,8 @@ summary:focus-visible {
 
 .space-modal-content {
   display: grid;
-  gap: 1.25rem;
+  gap: 0.7rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .space-map-panel {
@@ -896,7 +897,7 @@ summary:focus-visible {
 }
 
 .space-map-preview img {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1;
   border-radius: 0.25rem;
   display: block;
   height: auto;
@@ -979,18 +980,55 @@ summary:focus-visible {
   border-radius: 0.5rem;
   color: #ffffff;
   display: inline-flex;
-  font-size: 0.75rem;
+  font-size: 0.62rem;
   font-weight: 500;
   justify-content: center;
-  letter-spacing: 0.1em;
-  margin: 1.8rem auto 0.2rem;
-  min-height: 3rem;
-  padding: 0.8rem 1.1rem;
+  letter-spacing: 0.06em;
+  margin: 0.7rem auto 0.1rem;
+  min-height: 2.5rem;
+  padding: 0.65rem 0.7rem;
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
   transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
   width: fit-content;
+}
+
+@media (max-width: 520px) {
+  .space-modal {
+    max-height: calc(100svh - 1.5rem);
+    padding: 0.9rem;
+    width: calc(100% - 1rem);
+  }
+
+  .space-modal-copy {
+    margin-bottom: 0.8rem;
+    padding-inline: 2rem;
+  }
+
+  .space-modal-copy p {
+    font-size: clamp(1.8rem, 9vw, 2.35rem);
+  }
+
+  .space-gallery-stage,
+  .space-map-preview {
+    padding: 0.2rem;
+  }
+
+  .space-gallery-button {
+    font-size: 1.55rem;
+    height: calc(100% - 0.4rem);
+    top: 0.2rem;
+    width: 2rem;
+  }
+
+  .space-gallery-button-left {
+    left: 0.2rem;
+  }
+
+  .space-gallery-button-right {
+    right: 0.2rem;
+  }
 }
 
 .space-maps-link:hover {
