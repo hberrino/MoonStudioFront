@@ -10,3 +10,9 @@ Incluye un panel privado para administrar turnos, servicios, profesionales, hora
 - Node.js y Express
 - MySQL
 - Nginx
+
+## Despliegue
+
+La aplicación está desplegada en una instancia Ubuntu de Amazon Lightsail. Nginx sirve el frontend y actúa como proxy para la API, mientras que el backend y MySQL se ejecutan dentro del servidor.
+
+La configuración contempla un dominio personalizado, conexión HTTPS y la incorporación de Cloudflare para administrar DNS, seguridad y caché.
