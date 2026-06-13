@@ -7,6 +7,7 @@ import {
   findTurnosOcupados,
   upsertDisponibilidad,
 } from "../models/disponibilidad.model.js";
+import { isValidDate, isValidTime } from "../utils/validation.js";
 
 const diaSemanaMin = 0;
 const diaSemanaMax = 6;
@@ -36,8 +37,8 @@ export async function putDisponibilidadProfesional(req, res, next) {
       Number.isNaN(normalizedDiaSemana) ||
       normalizedDiaSemana < diaSemanaMin ||
       normalizedDiaSemana > diaSemanaMax ||
-      !horaInicio ||
-      !horaFin ||
+      !isValidTime(horaInicio) ||
+      !isValidTime(horaFin) ||
       Number.isNaN(normalizedIntervalo) ||
       normalizedIntervalo <= 0
     ) {
@@ -86,8 +87,8 @@ export async function getHorariosDisponibles(req, res, next) {
   try {
     const { fecha } = req.query;
 
-    if (!fecha) {
-      return res.status(400).json({ message: "fecha is required" });
+    if (!isValidDate(fecha)) {
+      return res.status(400).json({ message: "La fecha no es valida." });
     }
 
     const profesional = await findProfesionalById(req.params.idProfesional);

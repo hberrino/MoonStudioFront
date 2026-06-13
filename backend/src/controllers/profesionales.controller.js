@@ -7,6 +7,7 @@ import {
   replaceServiciosForProfesional,
   updateProfesional,
 } from "../models/profesional.model.js";
+import { isValidClientName, isValidPositiveInteger, sanitizeText } from "../utils/validation.js";
 
 export async function getProfesionales(_req, res, next) {
   try {
@@ -33,10 +34,10 @@ export async function getProfesional(req, res, next) {
 
 export async function postProfesional(req, res, next) {
   try {
-    const { nombre } = req.body;
+    const nombre = sanitizeText(req.body.nombre, 80);
 
-    if (!nombre) {
-      return res.status(400).json({ message: "nombre is required" });
+    if (!isValidClientName(nombre)) {
+      return res.status(400).json({ message: "Ingresa un nombre de profesional valido." });
     }
 
     const profesional = await createProfesional({ nombre });
@@ -48,10 +49,10 @@ export async function postProfesional(req, res, next) {
 
 export async function putProfesional(req, res, next) {
   try {
-    const { nombre } = req.body;
+    const nombre = sanitizeText(req.body.nombre, 80);
 
-    if (!nombre) {
-      return res.status(400).json({ message: "nombre is required" });
+    if (!isValidClientName(nombre)) {
+      return res.status(400).json({ message: "Ingresa un nombre de profesional valido." });
     }
 
     const profesional = await updateProfesional(req.params.id, { nombre });
@@ -106,9 +107,15 @@ export async function putProfesionalServicios(req, res, next) {
   try {
     const { servicioIds } = req.body;
 
-    if (!Array.isArray(servicioIds)) {
+    if (
+      !Array.isArray(servicioIds) ||
+      servicioIds.length > 100 ||
+      servicioIds.some((id) => !isValidPositiveInteger(id))
+    ) {
       return res.status(400).json({ message: "servicioIds must be an array" });
     }
+
+    const uniqueServicioIds = [...new Set(servicioIds.map(Number))];
 
     const profesional = await findProfesionalById(req.params.id);
 
@@ -116,7 +123,7 @@ export async function putProfesionalServicios(req, res, next) {
       return res.status(404).json({ message: "Profesional not found" });
     }
 
-    const servicios = await replaceServiciosForProfesional(req.params.id, servicioIds);
+    const servicios = await replaceServiciosForProfesional(req.params.id, uniqueServicioIds);
     return res.json(servicios);
   } catch (error) {
     return next(error);

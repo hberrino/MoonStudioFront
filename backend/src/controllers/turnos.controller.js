@@ -6,6 +6,8 @@ import {
   findTurnoById,
   updateTurnoEstado,
 } from "../models/turno.model.js";
+import { hasServicioAsignado } from "../models/profesional.model.js";
+import { getAvailableTimes } from "../services/availability.service.js";
 import {
   isValidClientName,
   isValidDate,
@@ -91,6 +93,28 @@ export async function postTurno(req, res, next) {
       !isValidTime(normalizedTurno.hora)
     ) {
       return res.status(400).json({ message: "Los datos del turno no son validos." });
+    }
+
+    const servicioAsignado = await hasServicioAsignado(
+      normalizedTurno.idProfesional,
+      normalizedTurno.idServicio,
+    );
+
+    if (!servicioAsignado) {
+      return res.status(400).json({
+        message: "El servicio no esta asignado a la profesional seleccionada.",
+      });
+    }
+
+    const horariosDisponibles = await getAvailableTimes(
+      normalizedTurno.idProfesional,
+      normalizedTurno.fecha,
+    );
+
+    if (!horariosDisponibles.includes(normalizedTurno.hora)) {
+      return res.status(409).json({
+        message: "El horario seleccionado ya no esta disponible.",
+      });
     }
 
     const turno = await createTurno(normalizedTurno);

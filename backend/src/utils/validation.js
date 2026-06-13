@@ -1,4 +1,4 @@
-const NAME_REGEX = /^[A-Za-zÀ-ÿÑñ\s]{2,80}$/;
+const NAME_REGEX = /^[\p{L}\s'-]{2,80}$/u;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_REGEX = /^\d{7,12}$/;
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -12,12 +12,12 @@ const ALLOWED_EMAIL_DOMAINS = new Set([
   "icloud.com",
 ]);
 
-export function sanitizeText(value) {
-  return String(value ?? "").trim().replace(/\s+/g, " ");
+export function sanitizeText(value, maxLength = 255) {
+  return String(value ?? "").trim().replace(/\s+/g, " ").slice(0, maxLength);
 }
 
 export function normalizeEmail(value) {
-  return sanitizeText(value).toLowerCase();
+  return sanitizeText(value, 254).toLowerCase();
 }
 
 export function normalizePhone(value) {
@@ -25,7 +25,7 @@ export function normalizePhone(value) {
 }
 
 export function isValidClientName(value) {
-  return NAME_REGEX.test(sanitizeText(value));
+  return NAME_REGEX.test(sanitizeText(value, 80));
 }
 
 export function isValidEmail(value) {
@@ -56,4 +56,10 @@ export function isValidTime(value) {
   if (!TIME_REGEX.test(String(value))) return false;
   const [hours, minutes] = String(value).split(":").map(Number);
   return hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59;
+}
+
+export function normalizeNullablePrice(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const price = Number(value);
+  return Number.isFinite(price) && price >= 0 && price <= 99999999.99 ? price : null;
 }

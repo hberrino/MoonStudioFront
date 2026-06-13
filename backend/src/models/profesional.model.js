@@ -42,6 +42,17 @@ export async function findServiciosByProfesional(idProfesional) {
   return rows;
 }
 
+export async function hasServicioAsignado(idProfesional, idServicio) {
+  const [rows] = await pool.query(
+    `SELECT 1
+     FROM profesional_servicio
+     WHERE id_profesional = ? AND id_servicio = ?
+     LIMIT 1`,
+    [idProfesional, idServicio],
+  );
+  return rows.length > 0;
+}
+
 export async function replaceServiciosForProfesional(idProfesional, servicioIds = []) {
   const connection = await pool.getConnection();
 

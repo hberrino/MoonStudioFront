@@ -9,7 +9,12 @@ export async function login(req, res, next) {
     const normalizedNombre = String(nombre ?? "").trim();
     const normalizedPassword = String(password ?? "");
 
-    if (!normalizedNombre || !normalizedPassword || normalizedNombre.length > 80) {
+    if (
+      !normalizedNombre ||
+      !normalizedPassword ||
+      normalizedNombre.length > 80 ||
+      normalizedPassword.length > 128
+    ) {
       return res.status(400).json({ message: "Usuario y password son requeridos." });
     }
 
@@ -32,7 +37,12 @@ export async function login(req, res, next) {
         rol: usuario.rol,
       },
       env.jwtSecret,
-      { expiresIn: "8h" },
+      {
+        algorithm: "HS256",
+        audience: "moonstudio-admin",
+        expiresIn: "8h",
+        issuer: "moonstudio-api",
+      },
     );
 
     return res.json({

@@ -10,7 +10,11 @@ export function requireAdmin(req, res, next) {
   }
 
   try {
-    const payload = jwt.verify(token, env.jwtSecret);
+    const payload = jwt.verify(token, env.jwtSecret, {
+      algorithms: ["HS256"],
+      audience: "moonstudio-admin",
+      issuer: "moonstudio-api",
+    });
 
     if (payload.rol !== "admin") {
       return res.status(403).json({ message: "Admin access required" });
@@ -18,7 +22,7 @@ export function requireAdmin(req, res, next) {
 
     req.user = payload;
     return next();
-  } catch (_error) {
-    return res.status(401).json({ message: "Invalid authorization token" });
+  } catch {
+    return res.status(401).json({ message: "La sesion no es valida o vencio." });
   }
 }

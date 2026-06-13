@@ -5,6 +5,7 @@ import {
   findServicioById,
   updateServicio,
 } from "../models/servicio.model.js";
+import { normalizeNullablePrice, sanitizeText } from "../utils/validation.js";
 
 export async function getServicios(_req, res, next) {
   try {
@@ -31,10 +32,12 @@ export async function getServicio(req, res, next) {
 
 export async function postServicio(req, res, next) {
   try {
-    const { nombre, precio = null } = req.body;
+    const nombre = sanitizeText(req.body.nombre, 120);
+    const precio = normalizeNullablePrice(req.body.precio);
+    const hasPrecio = req.body.precio !== undefined && req.body.precio !== null && req.body.precio !== "";
 
-    if (!nombre) {
-      return res.status(400).json({ message: "nombre is required" });
+    if (!nombre || (hasPrecio && precio === null)) {
+      return res.status(400).json({ message: "Nombre o precio de servicio invalido." });
     }
 
     const servicio = await createServicio({ nombre, precio });
@@ -46,10 +49,12 @@ export async function postServicio(req, res, next) {
 
 export async function putServicio(req, res, next) {
   try {
-    const { nombre, precio = null } = req.body;
+    const nombre = sanitizeText(req.body.nombre, 120);
+    const precio = normalizeNullablePrice(req.body.precio);
+    const hasPrecio = req.body.precio !== undefined && req.body.precio !== null && req.body.precio !== "";
 
-    if (!nombre) {
-      return res.status(400).json({ message: "nombre is required" });
+    if (!nombre || (hasPrecio && precio === null)) {
+      return res.status(400).json({ message: "Nombre o precio de servicio invalido." });
     }
 
     const servicio = await updateServicio(req.params.id, { nombre, precio });

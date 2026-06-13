@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS turnos (
   CONSTRAINT fk_turnos_servicio
     FOREIGN KEY (id_servicio) REFERENCES servicios(id)
     ON DELETE RESTRICT,
-  UNIQUE (id_profesional, fecha, hora)
+  UNIQUE (id_profesional, fecha, hora),
+  INDEX idx_turnos_fecha_estado (fecha, estado)
 );
 
 CREATE TABLE IF NOT EXISTS usuarios (
@@ -76,5 +77,6 @@ CREATE TABLE IF NOT EXISTS bloqueos_profesional (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_bloqueos_profesional
     FOREIGN KEY (id_profesional) REFERENCES profesionales(id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  INDEX idx_bloqueos_profesional_fecha (id_profesional, fecha)
 );
