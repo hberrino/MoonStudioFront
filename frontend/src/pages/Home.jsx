@@ -32,8 +32,7 @@ export default function Home() {
           MOON STUDIO
         </h1>
         <p className="hero-description mt-7 max-w-3xl text-balance text-base font-medium uppercase leading-relaxed text-white/88 md:text-lg">
-          Un espacio de belleza serena, detalle fino y rituales pensados para
-          bajar el ritmo desde que entras.
+          Viví la experiencia Moon y viajá hacia tu mejor versión.
         </p>
         <div className="hero-actions mt-10 flex w-full max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
           <a className="button-primary" href="#reservar">
