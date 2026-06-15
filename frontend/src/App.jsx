@@ -4,6 +4,7 @@ import About from "./pages/About.jsx";
 import Admin from "./pages/Admin.jsx";
 import Booking from "./pages/Booking.jsx";
 import Home from "./pages/Home.jsx";
+import Policies from "./pages/Policies.jsx";
 import Services from "./pages/Services.jsx";
 
 export default function App() {
@@ -18,6 +19,14 @@ export default function App() {
               <Services />
               <About />
               <Booking />
+            </Layout>
+          }
+        />
+        <Route
+          path="/politicas"
+          element={
+            <Layout>
+              <Policies />
             </Layout>
           }
         />

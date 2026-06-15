@@ -4,7 +4,7 @@ export const team = [
   {
     id: "jazmin",
     name: "Jazmin Roca",
-    profession: "Estilista",
+    profession: "Profesional",
     role: "Color, corte y estilo",
     bio: "Estilista especializada en cortes y color personalizados que potencian la identidad y el estilo de cada persona.",
     image: "/images/profesionales/trabajos/Jazmin/perfil.jpg",
@@ -22,7 +22,7 @@ export const team = [
   {
     id: "mayra",
     name: "Mayra Contreras",
-    profession: "Lashista",
+    profession: "Profesional",
     role: "Cejas y pestañas",
     bio: "Especialista en lifting y extensiones de pestañas, laminado de cejas, diseño y perfilado con hilo o pinza, y depilación facial. Para realzar tu mirada con un resultado natural.",
     image: "/images/profesionales/trabajos/Mayra/perfil.jpg",
@@ -39,7 +39,7 @@ export const team = [
   {
     id: "daiana",
     name: "Daiana Chambers",
-    profession: "Especialista en miradas",
+    profession: "Profesional",
     role: "Cejas y pestañas",
     bio: "Especialista en miradas. Extensiones de pestañas y perfilado de cejas con un enfoque personalizado y cuidado profesional.",
     image: "/images/profesionales/trabajos/Daiana/Perfil.jpg",
@@ -52,7 +52,7 @@ export const team = [
   {
     id: "elizabeth",
     name: "Elizabeth Segura",
-    profession: "Manicurista profesional",
+    profession: "Profesional",
     role: "Manos, uñas y pies",
     bio: "Manicurista Profesional. Creando uñas elegantes y duraderas, combinando técnica, creatividad y cuidado.",
     image: "/images/profesionales/trabajos/Ely/perfil.jpg",
@@ -71,7 +71,7 @@ export const team = [
   {
     id: "julieta",
     name: "Julieta Chambers",
-    profession: "Manicurista",
+    profession: "Profesional",
     role: "Manos y uñas",
     bio: "Especialista en semipermanente, capping y Soft Gel. Creo uñas resistentes, delicadas y personalizadas para que te sientas segura y arreglada todos los días.",
     image: "/images/profesionales/trabajos/Julieta/perfil.jpg",
@@ -89,7 +89,7 @@ export const team = [
   {
     id: "valentina",
     name: "Valentina Chambers",
-    profession: "Especialista en miradas",
+    profession: "Profesional",
     role: "Cejas y pestañas",
     bio: "Especialista en lifting de pestañas y perfilado de cejas. Realzamos tu mirada con técnicas profesionales, atención personalizada y resultados naturales que destacan tu belleza.",
     image: "/images/profesionales/trabajos/Valen/perfil.jpg",

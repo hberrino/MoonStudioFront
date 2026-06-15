@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const navItems = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Servicios", href: "#servicios" },
-  { label: "Nosotros", href: "#nosotros" },
-  { label: "Estudio", href: "#espacio" },
-  { label: "Reservar turno", href: "#reservar" },
+  { label: "Inicio", href: "/#inicio" },
+  { label: "Servicios", href: "/#servicios" },
+  { label: "Nosotros", href: "/#nosotros" },
+  { label: "Estudio", href: "/#espacio" },
+  { label: "Reservar turno", href: "/#reservar" },
 ];
 
 export default function Header() {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
 
@@ -23,7 +25,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", updateHeaderVisibility);
   }, []);
 
-  const isVisible = hasScrolled || isOpen;
+  const isVisible = location.pathname !== "/" || hasScrolled || isOpen;
 
   return (
     <header
@@ -35,7 +37,7 @@ export default function Header() {
         <a
           aria-label="Moon Studio inicio"
           className="site-logo-link"
-          href="#inicio"
+          href="/#inicio"
           onClick={() => setIsOpen(false)}
         >
           <img
@@ -57,7 +59,7 @@ export default function Header() {
 
         <a
           className="hidden rounded-full border border-[#5b4f3f] bg-[#5b4f3f] px-5 py-3 text-label uppercase text-white transition hover:border-[#4f4436] hover:bg-[#4f4436] hover:shadow-[0_10px_26px_rgba(80,69,52,0.18)] md:inline-flex md:justify-self-end"
-          href="#reservar"
+          href="/#reservar"
         >
           Reservar turno
         </a>

@@ -2,7 +2,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-outline-variant bg-surface-container-low">
       <div className="mx-auto grid max-w-container items-center gap-7 px-5 py-12 text-center md:grid-cols-[1fr_auto_1fr] md:px-16 md:py-16">
-        <a aria-label="Moon Studio inicio" className="footer-logo-link" href="#inicio">
+        <a aria-label="Moon Studio inicio" className="footer-logo-link" href="/#inicio">
           <img
             alt="Moon Studio"
             className="footer-logo-img"
@@ -28,7 +28,7 @@ export default function Footer() {
           >
             Direccion
           </a>
-          <a className="transition hover:text-primary" href="#politicas">
+          <a className="transition hover:text-primary" href="/politicas">
             Politicas
           </a>
         </nav>
