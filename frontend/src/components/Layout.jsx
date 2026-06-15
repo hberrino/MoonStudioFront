@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
+import SiteIntro from "./SiteIntro.jsx";
 
 export default function Layout({ children }) {
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="site-background min-h-screen text-on-background">
+      <SiteIntro />
       <div className="grain-overlay" />
       <Header />
       <main>{children}</main>

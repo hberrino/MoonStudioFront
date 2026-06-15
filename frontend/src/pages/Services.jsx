@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import ProgressiveImage from "../components/ProgressiveImage.jsx";
 import { services } from "../data/services.js";
 
 const SERVICE_AUTO_SLIDE_MS = 3000;
@@ -140,11 +141,10 @@ function ServiceCard({ index, service }) {
       data-service-index={index}
     >
       <div className="service-slide-media overflow-hidden rounded-lg">
-        <img
+        <ProgressiveImage
           alt={service.title}
           className="service-slide-image"
-          decoding="async"
-          loading="lazy"
+          eager={index === 0}
           src={service.image}
         />
       </div>

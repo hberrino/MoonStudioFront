@@ -1,17 +1,22 @@
+import { useState } from "react";
+
 const heroVideo = "/videos/nuevaintro.mp4";
 
 export default function Home() {
+  const [isVideoReady, setIsVideoReady] = useState(false);
+
   return (
     <section
-      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 py-28 text-center"
+      className="hero-section relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 py-28 text-center"
       id="inicio"
     >
       <video
         aria-label="Video ambiente de Moon Studio"
         autoPlay
-        className="absolute inset-0 h-full w-full object-cover"
+        className={`hero-video absolute inset-0 h-full w-full object-cover${isVideoReady ? " is-ready" : ""}`}
         loop
         muted
+        onCanPlay={() => setIsVideoReady(true)}
         playsInline
         poster="/images/logo/moon-studio-hero.jpg"
         preload="metadata"

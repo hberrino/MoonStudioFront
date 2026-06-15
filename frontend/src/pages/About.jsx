@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ProgressiveImage from "../components/ProgressiveImage.jsx";
 import { team } from "../data/team.js";
 
 const WORK_AUTO_SLIDE_MS = 3000;
@@ -29,6 +30,12 @@ function advanceCarousel(carousel) {
     left: isAtEnd ? 0 : carousel.scrollLeft + carousel.clientWidth,
     behavior: "smooth",
   });
+}
+
+function preloadImage(src) {
+  if (!src) return;
+  const image = new Image();
+  image.src = src;
 }
 
 export default function About() {
@@ -262,11 +269,10 @@ export default function About() {
               key={`${person.id}-${isDuplicate ? "copy" : "original"}`}
             >
               <div className="arch-image mb-6 h-80 overflow-hidden bg-tertiary-fixed">
-                <img
+                <ProgressiveImage
                   alt={`Retrato de ${person.name}`}
                   className="h-full w-full object-cover opacity-90 mix-blend-multiply"
-                  decoding="async"
-                  loading="lazy"
+                  eager={index < 3}
                   src={person.image}
                 />
               </div>
@@ -278,6 +284,9 @@ export default function About() {
               <button
                 className="button-primary mt-6 w-full"
                 onClick={() => setSelectedPerson(person)}
+                onFocus={() => preloadImage(person.workImages[0])}
+                onMouseEnter={() => preloadImage(person.workImages[0])}
+                onTouchStart={() => preloadImage(person.workImages[0])}
                 tabIndex={isDuplicate ? -1 : undefined}
                 type="button"
               >
@@ -352,10 +361,9 @@ export default function About() {
                 <div className="profile-work-carousel" ref={workCarouselRef}>
                   {selectedPerson.workImages.map((image, index) => (
                     <figure className="profile-work-slide" key={`${selectedPerson.id}-${image}`}>
-                      <img
+                      <ProgressiveImage
                         alt={`Trabajo ${index + 1} de ${selectedPerson.name}`}
-                        decoding="async"
-                        loading="lazy"
+                        eager={index === 0}
                         src={image}
                       />
                     </figure>
@@ -425,7 +433,10 @@ export default function About() {
           <div className="space-preview-actions mt-7">
             <button
               className="space-link-button"
+              onFocus={() => preloadImage(spaceImages[0])}
+              onMouseEnter={() => preloadImage(spaceImages[0])}
               onClick={() => {
+                preloadImage(spaceImages[0]);
                 setSpaceModalView("studio");
                 setIsSpaceModalOpen(true);
               }}
@@ -435,7 +446,10 @@ export default function About() {
             </button>
             <button
               className="space-link-button space-mobile-directions"
+              onFocus={() => preloadImage("/images/espacio/map.jpg")}
+              onMouseEnter={() => preloadImage("/images/espacio/map.jpg")}
               onClick={() => {
+                preloadImage("/images/espacio/map.jpg");
                 setSpaceModalView("map");
                 setIsSpaceModalOpen(true);
               }}
@@ -446,11 +460,9 @@ export default function About() {
           </div>
         </div>
         <div className="h-80 overflow-hidden rounded-lg border border-outline-variant/40 bg-surface-container shadow-halo md:h-96">
-          <img
+          <ProgressiveImage
             alt="Detalle del estudio"
             className="h-full w-full object-cover opacity-85"
-            decoding="async"
-            loading="lazy"
             src="/images/espacio/estudioprincipal.jpg"
           />
         </div>
@@ -498,10 +510,9 @@ export default function About() {
                 <div className="space-gallery-carousel" ref={spaceCarouselRef}>
                   {spaceImages.map((image, index) => (
                     <figure className="space-gallery-slide" key={image}>
-                      <img
+                      <ProgressiveImage
                         alt={`Espacio Moon Studio ${index + 1}`}
-                        decoding="async"
-                        loading="lazy"
+                        eager={index === 0}
                         src={image}
                       />
                     </figure>
@@ -525,10 +536,9 @@ export default function About() {
                   rel="noreferrer"
                   target="_blank"
                 >
-                  <img
+                  <ProgressiveImage
                     alt="Mapa de ubicación de Moon Studio"
-                    decoding="async"
-                    loading="lazy"
+                    eager
                     src="/images/espacio/map.jpg"
                   />
                 </a>

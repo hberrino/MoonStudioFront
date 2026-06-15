@@ -35,6 +35,125 @@ body {
   letter-spacing: 0;
 }
 
+.site-intro {
+  align-items: center;
+  background: #f5f1e9;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  inset: 0;
+  justify-content: center;
+  opacity: 1;
+  position: fixed;
+  transition: opacity 340ms ease, visibility 340ms ease;
+  visibility: visible;
+  z-index: 1000;
+}
+
+.site-intro.is-leaving {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.site-intro-brand {
+  align-items: center;
+  color: #675a48;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  line-height: 0.82;
+  text-transform: uppercase;
+}
+
+.site-intro-brand span {
+  font-size: clamp(3.25rem, 12vw, 6rem);
+  font-weight: 400;
+}
+
+.site-intro-brand strong {
+  font-family: var(--font-body);
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.48em;
+  margin-left: 0.48em;
+  margin-top: 1rem;
+}
+
+.site-intro-line {
+  background: rgba(103, 90, 72, 0.2);
+  height: 1px;
+  overflow: hidden;
+  position: relative;
+  width: min(11rem, 42vw);
+}
+
+.site-intro-line::after {
+  animation: intro-line 900ms ease-in-out infinite;
+  background: #675a48;
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: translateX(-100%);
+}
+
+@keyframes intro-line {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.hero-section {
+  background: #292521 url("/images/logo/moon-studio-hero.jpg") center / cover no-repeat;
+}
+
+.hero-video {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.hero-video.is-ready {
+  opacity: 1;
+}
+
+.progressive-image {
+  background: #e9e3da;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.progressive-image-placeholder {
+  background: linear-gradient(105deg, #e8e1d7 28%, #f4efe7 46%, #e8e1d7 64%);
+  background-size: 220% 100%;
+  inset: 0;
+  position: absolute;
+  transition: opacity 320ms ease;
+  z-index: 1;
+  animation: image-placeholder 1.35s ease-in-out infinite;
+}
+
+.progressive-image img {
+  opacity: 0;
+  transition: opacity 420ms ease, transform 700ms ease;
+}
+
+.progressive-image.is-loaded img {
+  opacity: 1;
+}
+
+.progressive-image.is-loaded .progressive-image-placeholder {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes image-placeholder {
+  to {
+    background-position: -220% 0;
+  }
+}
+
 [data-reveal] {
   filter: blur(3px);
   opacity: 0;
@@ -57,6 +176,18 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-intro-line::after,
+  .progressive-image-placeholder {
+    animation: none;
+  }
+
+  .hero-video,
+  .progressive-image img,
+  .progressive-image-placeholder,
+  .site-intro {
+    transition: none;
+  }
+
   [data-reveal] {
     filter: none;
     opacity: 1;
@@ -461,6 +592,10 @@ summary:focus-visible {
   transform: scale(1.035);
 }
 
+.service-slide-media:hover .progressive-image.is-loaded .service-slide-image {
+  transform: scale(1.035);
+}
+
 .services-carousel h3 {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72), 0 12px 26px rgba(103, 90, 72, 0.12);
   -webkit-text-stroke: 0.55px currentColor;
@@ -769,6 +904,12 @@ summary:focus-visible {
   width: 100%;
 }
 
+.profile-work-slide .progressive-image,
+.space-gallery-slide .progressive-image,
+.space-map-preview .progressive-image {
+  border-radius: inherit;
+}
+
 .profile-work-button {
   position: absolute;
   top: 50%;
@@ -1065,7 +1206,7 @@ summary:focus-visible {
 
 .space-gallery-slide {
   aspect-ratio: 4 / 4;
-  background: #000000;
+  background: #e9e3da;
   border: 0;
   border-radius: 0.25rem;
   flex: 0 0 100%;
