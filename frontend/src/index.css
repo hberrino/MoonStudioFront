@@ -509,6 +509,10 @@ summary:focus-visible {
   color: #1b1c19;
 }
 
+.home-studio-contact {
+  margin-top: 48px;
+}
+
 @media (max-width: 767px) {
   .policies-page {
     padding: 128px 20px 80px;
@@ -536,6 +540,10 @@ summary:focus-visible {
   .policies-contact {
     margin-top: 52px;
     padding: 44px 22px;
+  }
+
+  .home-studio-contact {
+    margin-top: 36px;
   }
 }
 
