@@ -511,7 +511,6 @@ summary:focus-visible {
 
 .home-studio-contact {
   background: transparent;
-  border-bottom: 1px solid rgba(103, 90, 72, 0.2);
   border-top: 1px solid rgba(103, 90, 72, 0.2);
   margin-top: 48px;
   padding-bottom: 52px;
@@ -520,6 +519,10 @@ summary:focus-visible {
 
 .home-studio-contact h2 {
   font-size: clamp(2.25rem, 5vw, 3.6rem);
+}
+
+#reservar {
+  padding-bottom: 32px;
 }
 
 @media (max-width: 767px) {
@@ -554,6 +557,10 @@ summary:focus-visible {
   .home-studio-contact {
     margin-top: 36px;
     padding: 42px 12px;
+  }
+
+  #reservar {
+    padding-bottom: 24px;
   }
 }
 

@@ -468,15 +468,6 @@ export default function About() {
         </div>
       </div>
 
-      <aside className="policies-contact home-studio-contact" data-reveal>
-        <p className="text-label uppercase text-tertiary">¿Tenés alguna duda?</p>
-        <h2>Estamos para ayudarte</h2>
-        <p>Podés comunicarte con el estudio antes de reservar o modificar un turno existente.</p>
-        <a href="https://www.instagram.com/moonstudio.ok/" rel="noreferrer" target="_blank">
-          Contactar al estudio
-        </a>
-      </aside>
-
       {isSpaceModalOpen ? (
         <div
           className="profile-modal-backdrop"
