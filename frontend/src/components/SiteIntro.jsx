@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const INTRO_KEY = "moonstudio:intro-shown";
 const MIN_VISIBLE_MS = 520;
-const MAX_VISIBLE_MS = 1100;
+const MAX_VISIBLE_MS = 1600;
 const CRITICAL_IMAGES = [
   "/images/logo/moon-studio-hero.jpg",
   "/images/servicios/servicio_peluqueria.jpg",
@@ -28,6 +28,7 @@ export default function SiteIntro() {
     }
   });
   const [isLeaving, setIsLeaving] = useState(false);
+  const [isFontReady, setIsFontReady] = useState(false);
 
   useEffect(() => {
     if (!isVisible) return undefined;
@@ -52,8 +53,15 @@ export default function SiteIntro() {
       }, remaining);
     };
 
+    const fontPromise = document.fonts
+      ? Promise.all([
+          document.fonts.load('400 72px "Bodoni Moda"'),
+          document.fonts.load('500 12px "DM Sans"'),
+        ]).then(() => setIsFontReady(true))
+      : Promise.resolve().then(() => setIsFontReady(true));
+
     const maximumTimer = window.setTimeout(finish, MAX_VISIBLE_MS);
-    Promise.all(CRITICAL_IMAGES.map(preloadImage)).then(() => {
+    Promise.all([...CRITICAL_IMAGES.map(preloadImage), fontPromise]).then(() => {
       window.clearTimeout(maximumTimer);
       finish();
     });
@@ -68,7 +76,10 @@ export default function SiteIntro() {
   if (!isVisible) return null;
 
   return (
-    <div aria-hidden="true" className={`site-intro${isLeaving ? " is-leaving" : ""}`}>
+    <div
+      aria-hidden="true"
+      className={`site-intro${isFontReady ? " is-font-ready" : ""}${isLeaving ? " is-leaving" : ""}`}
+    >
       <div className="site-intro-brand">
         <span>Moon</span>
         <strong>Studio</strong>
