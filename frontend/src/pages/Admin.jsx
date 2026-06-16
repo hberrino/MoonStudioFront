@@ -3,6 +3,7 @@ import { api } from "../lib/api.js";
 
 const emptyServiceForm = {
   nombre: "",
+  seccion: "peluqueria",
   precioTipo: "consultar",
   precioMin: "",
   precioMax: "",
@@ -23,6 +24,12 @@ const diasSemana = [
   { value: 4, label: "Jueves" },
   { value: 5, label: "Viernes" },
   { value: 6, label: "Sabado" },
+];
+const serviceSections = [
+  { value: "peluqueria", label: "Peluquería" },
+  { value: "cejas_pestanas", label: "Cejas y pestañas" },
+  { value: "manos_unas", label: "Manos y uñas" },
+  { value: "podoestetica", label: "Podoestética" },
 ];
 const intervalos = [
   { value: 15, label: "15 min" },
@@ -180,6 +187,7 @@ export default function Admin() {
       setError("");
       const updatedService = await api.updateServicio(service.id, {
         nombre: service.nombre,
+        seccion: formData.get("seccion"),
         ...buildServicePricePayload({
           precioTipo: formData.get("precioTipo"),
           precioMin: formData.get("precioMin"),
@@ -222,6 +230,7 @@ export default function Admin() {
       setError("");
       const createdService = await api.createServicio({
         nombre: serviceForm.nombre,
+        seccion: serviceForm.seccion,
         ...buildServicePricePayload(serviceForm),
       });
       const currentProfessionalServices = await api.getProfesionalServicios(serviceForm.idProfesional);
@@ -585,6 +594,20 @@ export default function Admin() {
                 <select
                   className="form-input form-input-boxed"
                   onChange={(event) =>
+                    setServiceForm({ ...serviceForm, seccion: event.target.value })
+                  }
+                  required
+                  value={serviceForm.seccion}
+                >
+                  {serviceSections.map((section) => (
+                    <option key={section.value} value={section.value}>
+                      {section.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="form-input form-input-boxed"
+                  onChange={(event) =>
                     setServiceForm({
                       ...serviceForm,
                       precioTipo: event.target.value,
@@ -664,8 +687,20 @@ export default function Admin() {
                       >
                         <span>
                           {service.nombre}
+                          <small>{getServiceSectionLabel(service.seccion)}</small>
                           <small>{formatServicePrice(service)}</small>
                         </span>
+                        <select
+                          className="form-input form-input-boxed"
+                          defaultValue={service.seccion ?? "peluqueria"}
+                          name="seccion"
+                        >
+                          {serviceSections.map((section) => (
+                            <option key={section.value} value={section.value}>
+                              {section.label}
+                            </option>
+                          ))}
+                        </select>
                         <select
                           className="form-input form-input-boxed"
                           defaultValue={service.precio_tipo ?? "consultar"}
@@ -984,6 +1019,10 @@ function buildServicePricePayload(values) {
     precio_min: precioTipo === "consultar" ? null : precioMin,
     precio_max: precioTipo === "rango" ? precioMax : null,
   };
+}
+
+function getServiceSectionLabel(value) {
+  return serviceSections.find((section) => section.value === value)?.label || "Peluquería";
 }
 
 function formatServicePrice(service) {

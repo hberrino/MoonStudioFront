@@ -8,6 +8,7 @@ import {
 import {
   normalizeNullablePrice,
   normalizePriceType,
+  normalizeServiceSection,
   sanitizeText,
 } from "../utils/validation.js";
 
@@ -37,13 +38,14 @@ export async function getServicio(req, res, next) {
 export async function postServicio(req, res, next) {
   try {
     const nombre = sanitizeText(req.body.nombre, 120);
+    const seccion = normalizeServiceSection(req.body.seccion);
     const pricePayload = normalizeServicePrice(req.body);
 
-    if (!nombre || !pricePayload) {
+    if (!nombre || !seccion || !pricePayload) {
       return res.status(400).json({ message: "Nombre o precio de servicio invalido." });
     }
 
-    const servicio = await createServicio({ nombre, ...pricePayload });
+    const servicio = await createServicio({ nombre, seccion, ...pricePayload });
     return res.status(201).json(servicio);
   } catch (error) {
     return next(error);
@@ -53,13 +55,14 @@ export async function postServicio(req, res, next) {
 export async function putServicio(req, res, next) {
   try {
     const nombre = sanitizeText(req.body.nombre, 120);
+    const seccion = normalizeServiceSection(req.body.seccion);
     const pricePayload = normalizeServicePrice(req.body);
 
-    if (!nombre || !pricePayload) {
+    if (!nombre || !seccion || !pricePayload) {
       return res.status(400).json({ message: "Nombre o precio de servicio invalido." });
     }
 
-    const servicio = await updateServicio(req.params.id, { nombre, ...pricePayload });
+    const servicio = await updateServicio(req.params.id, { nombre, seccion, ...pricePayload });
 
     if (!servicio) {
       return res.status(404).json({ message: "Servicio not found" });

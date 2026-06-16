@@ -10,6 +10,7 @@ const turnoSelect = `
     p.nombre AS profesional_nombre,
     t.id_servicio,
     s.nombre AS servicio_nombre,
+    s.seccion AS servicio_seccion,
     s.precio_tipo AS servicio_precio_tipo,
     s.precio_min AS servicio_precio_min,
     s.precio_max AS servicio_precio_max,

@@ -68,3 +68,10 @@ export function normalizePriceType(value) {
   const priceType = String(value ?? "consultar").trim().toLowerCase();
   return ["consultar", "fijo", "desde", "rango"].includes(priceType) ? priceType : null;
 }
+
+export function normalizeServiceSection(value) {
+  const section = String(value ?? "peluqueria").trim().toLowerCase();
+  return ["peluqueria", "cejas_pestanas", "manos_unas", "podoestetica"].includes(section)
+    ? section
+    : null;
+}

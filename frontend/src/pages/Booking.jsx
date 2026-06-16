@@ -19,6 +19,12 @@ const ALLOWED_EMAIL_DOMAINS = new Set([
   "yahoo.com",
   "icloud.com",
 ]);
+const serviceSections = [
+  { value: "peluqueria", label: "Peluquería" },
+  { value: "cejas_pestanas", label: "Cejas y pestañas" },
+  { value: "manos_unas", label: "Manos y uñas" },
+  { value: "podoestetica", label: "Podoestética" },
+];
 
 export default function Booking() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -27,6 +33,7 @@ export default function Booking() {
   const [servicios, setServicios] = useState([]);
   const [profesionales, setProfesionales] = useState([]);
   const [serviciosPorProfesional, setServiciosPorProfesional] = useState({});
+  const [selectedServiceSection, setSelectedServiceSection] = useState("");
   const [selectedServicio, setSelectedServicio] = useState("");
   const [selectedProfesional, setSelectedProfesional] = useState("");
   const [acceptsProfessionalContact, setAcceptsProfessionalContact] = useState(false);
@@ -40,6 +47,12 @@ export default function Booking() {
     () => servicios.find((service) => String(service.id) === selectedServicio) || null,
     [selectedServicio, servicios],
   );
+  const filteredServicios = useMemo(() => {
+    if (!selectedServiceSection) return [];
+    return servicios.filter(
+      (service) => (service.seccion || "peluqueria") === selectedServiceSection,
+    );
+  }, [selectedServiceSection, servicios]);
 
   useEffect(() => {
     let isMounted = true;
@@ -221,6 +234,7 @@ export default function Booking() {
 
       setFormValues(initialFormValues);
       setFormErrors({});
+      setSelectedServiceSection("");
       setSelectedServicio("");
       setSelectedProfesional("");
       setAcceptsProfessionalContact(false);
@@ -307,9 +321,33 @@ export default function Booking() {
             <>
               <FormGroup title="Servicio">
                 <label className="booking-select-shell">
+                  <span className="form-label">Sector</span>
+                  <select
+                    className="form-input form-input-boxed booking-service-select"
+                    name="service-section-select"
+                    onChange={(event) => {
+                      setSelectedServiceSection(event.target.value);
+                      setSelectedServicio("");
+                      setSelectedProfesional("");
+                      setSelectedDate("");
+                      updateField("time", "");
+                    }}
+                    required
+                    value={selectedServiceSection}
+                  >
+                    <option value="">Selecciona un sector</option>
+                    {serviceSections.map((section) => (
+                      <option key={section.value} value={section.value}>
+                        {section.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="booking-select-shell">
                   <span className="form-label">Servicio</span>
                   <select
                     className="form-input form-input-boxed booking-service-select"
+                    disabled={!selectedServiceSection}
                     name="service-select"
                     onChange={(event) => {
                       setSelectedServicio(event.target.value);
@@ -320,8 +358,12 @@ export default function Booking() {
                     required
                     value={selectedServicio}
                   >
-                    <option value="">Selecciona un servicio</option>
-                    {servicios.map((service) => (
+                    <option value="">
+                      {selectedServiceSection
+                        ? "Selecciona un servicio"
+                        : "Selecciona un sector primero"}
+                    </option>
+                    {filteredServicios.map((service) => (
                       <option key={service.id} value={service.id}>
                         {formatServiceOption(service)}
                       </option>
@@ -335,11 +377,11 @@ export default function Booking() {
                   </div>
                 ) : (
                   <p className="booking-select-help">
-                    Elegi primero el servicio para ver las profesionales disponibles.
+                    Elegi primero el sector y el servicio para ver las profesionales disponibles.
                   </p>
                 )}
                 <div className="hidden">
-                  {servicios.map((service) => (
+                  {filteredServicios.map((service) => (
                     <label className="cursor-pointer" key={service.id}>
                       <input
                         checked={selectedServicio === String(service.id)}

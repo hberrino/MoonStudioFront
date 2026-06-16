@@ -2,7 +2,7 @@ import { pool } from "../config/db.js";
 
 export async function findAllServicios() {
   const [rows] = await pool.query(
-    `SELECT id, nombre, precio_tipo, precio_min, precio_max, precio_min AS precio
+    `SELECT id, nombre, seccion, precio_tipo, precio_min, precio_max, precio_min AS precio
      FROM servicios
      ORDER BY id`,
   );
@@ -11,7 +11,7 @@ export async function findAllServicios() {
 
 export async function findServicioById(id) {
   const [rows] = await pool.query(
-    `SELECT id, nombre, precio_tipo, precio_min, precio_max, precio_min AS precio
+    `SELECT id, nombre, seccion, precio_tipo, precio_min, precio_max, precio_min AS precio
      FROM servicios
      WHERE id = ?`,
     [id],
@@ -21,27 +21,28 @@ export async function findServicioById(id) {
 
 export async function createServicio({
   nombre,
+  seccion = "peluqueria",
   precioTipo = "consultar",
   precioMin = null,
   precioMax = null,
 }) {
   const [result] = await pool.query(
-    `INSERT INTO servicios (nombre, precio_tipo, precio_min, precio_max)
-     VALUES (?, ?, ?, ?)`,
-    [nombre, precioTipo, precioMin, precioMax],
+    `INSERT INTO servicios (nombre, seccion, precio_tipo, precio_min, precio_max)
+     VALUES (?, ?, ?, ?, ?)`,
+    [nombre, seccion, precioTipo, precioMin, precioMax],
   );
   return findServicioById(result.insertId);
 }
 
 export async function updateServicio(
   id,
-  { nombre, precioTipo = "consultar", precioMin = null, precioMax = null },
+  { nombre, seccion = "peluqueria", precioTipo = "consultar", precioMin = null, precioMax = null },
 ) {
   const [result] = await pool.query(
     `UPDATE servicios
-     SET nombre = ?, precio_tipo = ?, precio_min = ?, precio_max = ?
+     SET nombre = ?, seccion = ?, precio_tipo = ?, precio_min = ?, precio_max = ?
      WHERE id = ?`,
-    [nombre, precioTipo, precioMin, precioMax, id],
+    [nombre, seccion, precioTipo, precioMin, precioMax, id],
   );
 
   if (result.affectedRows === 0) return null;

@@ -32,7 +32,7 @@ export async function deleteProfesional(id) {
 
 export async function findServiciosByProfesional(idProfesional) {
   const [rows] = await pool.query(
-    `SELECT s.id, s.nombre, s.precio_tipo, s.precio_min, s.precio_max, s.precio_min AS precio
+    `SELECT s.id, s.nombre, s.seccion, s.precio_tipo, s.precio_min, s.precio_max, s.precio_min AS precio
      FROM servicios s
      INNER JOIN profesional_servicio ps ON ps.id_servicio = s.id
      WHERE ps.id_profesional = ?
