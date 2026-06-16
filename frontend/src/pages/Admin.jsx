@@ -58,6 +58,30 @@ export default function Admin() {
   const [error, setError] = useState("");
   const isLoggedIn = Boolean(token);
 
+  const resetAdminSession = useCallback(() => {
+    localStorage.removeItem("moon_admin_token");
+    setToken("");
+    setTurnos([]);
+    setServicios([]);
+    setProfesionales([]);
+    setDisponibilidad([]);
+    setBloqueos([]);
+    setMessage("");
+    setError("");
+  }, []);
+
+  const handleAdminRequestError = useCallback(
+    (requestError) => {
+      if (requestError.status === 401 || requestError.status === 403) {
+        resetAdminSession();
+        return;
+      }
+
+      setError(requestError.message);
+    },
+    [resetAdminSession],
+  );
+
   const sortedTurnos = useMemo(() => {
     const now = new Date();
     const professionalFilteredTurnos = turnosProfessionalFilter
@@ -87,9 +111,9 @@ export default function Admin() {
       setProfesionales(nextProfesionales);
 
     } catch (requestError) {
-      setError(requestError.message);
+      handleAdminRequestError(requestError);
     }
-  }, []);
+  }, [handleAdminRequestError]);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -109,7 +133,7 @@ export default function Admin() {
       .getBloqueosProfesional(availabilityForm.idProfesional)
       .then(setBloqueos)
       .catch(handleAdminRequestError);
-  }, [availabilityForm.idProfesional, isLoggedIn]);
+  }, [availabilityForm.idProfesional, handleAdminRequestError, isLoggedIn]);
 
   async function handleLogin(event) {
     event.preventDefault();
@@ -121,32 +145,12 @@ export default function Admin() {
       setToken(data.token);
       setMessage("Sesion iniciada.");
     } catch (requestError) {
-      handleAdminRequestError(requestError);
+      setError(requestError.message);
     }
   }
 
   function handleLogout() {
-    localStorage.removeItem("moon_admin_token");
-    setToken("");
-    setTurnos([]);
-    setMessage("");
-  }
-
-  function handleAdminRequestError(requestError) {
-    if (requestError.status === 401) {
-      localStorage.removeItem("moon_admin_token");
-      setToken("");
-      setTurnos([]);
-      setServicios([]);
-      setProfesionales([]);
-      setDisponibilidad([]);
-      setBloqueos([]);
-      setMessage("");
-      setError("Tu sesion vencio. Inicia sesion nuevamente.");
-      return;
-    }
-
-    setError(requestError.message);
+    resetAdminSession();
   }
 
   async function handleEstadoChange(turnoId, estado) {
