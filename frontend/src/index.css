@@ -2121,6 +2121,14 @@ summary:focus-visible {
   font-weight: 500;
 }
 
+.admin-price-row > span small {
+  color: #7c7164;
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 400;
+  margin-top: 0.2rem;
+}
+
 .admin-list-row {
   align-items: center;
   background: #fbf9f4;
@@ -2231,6 +2239,11 @@ button:disabled {
     width: 100%;
   }
 
+  .admin-price-row .button-secondary,
+  .admin-price-row .admin-danger-button {
+    padding: 0.9rem 1rem;
+  }
+
   .admin-disclosure summary {
     align-items: flex-start;
     gap: 1rem;
@@ -2296,7 +2309,13 @@ button:disabled {
   }
 
   .admin-price-row {
-    grid-template-columns: minmax(160px, 1fr) minmax(130px, 0.6fr) auto auto;
+    grid-template-columns:
+      minmax(150px, 1fr)
+      minmax(130px, 0.7fr)
+      minmax(110px, 0.6fr)
+      minmax(110px, 0.6fr)
+      auto
+      auto;
   }
 
   .admin-list-row {

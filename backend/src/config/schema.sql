@@ -1,7 +1,9 @@
 CREATE TABLE IF NOT EXISTS servicios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(255) NOT NULL,
-  precio DECIMAL(10, 2) NULL
+  precio_tipo ENUM('consultar', 'fijo', 'desde', 'rango') NOT NULL DEFAULT 'consultar',
+  precio_min DECIMAL(10, 2) NULL,
+  precio_max DECIMAL(10, 2) NULL
 );
 
 CREATE TABLE IF NOT EXISTS profesionales (

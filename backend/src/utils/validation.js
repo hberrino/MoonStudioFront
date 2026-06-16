@@ -63,3 +63,8 @@ export function normalizeNullablePrice(value) {
   const price = Number(value);
   return Number.isFinite(price) && price >= 0 && price <= 99999999.99 ? price : null;
 }
+
+export function normalizePriceType(value) {
+  const priceType = String(value ?? "consultar").trim().toLowerCase();
+  return ["consultar", "fijo", "desde", "rango"].includes(priceType) ? priceType : null;
+}

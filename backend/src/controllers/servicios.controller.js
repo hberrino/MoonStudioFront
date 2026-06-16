@@ -5,7 +5,11 @@ import {
   findServicioById,
   updateServicio,
 } from "../models/servicio.model.js";
-import { normalizeNullablePrice, sanitizeText } from "../utils/validation.js";
+import {
+  normalizeNullablePrice,
+  normalizePriceType,
+  sanitizeText,
+} from "../utils/validation.js";
 
 export async function getServicios(_req, res, next) {
   try {
@@ -33,14 +37,13 @@ export async function getServicio(req, res, next) {
 export async function postServicio(req, res, next) {
   try {
     const nombre = sanitizeText(req.body.nombre, 120);
-    const precio = normalizeNullablePrice(req.body.precio);
-    const hasPrecio = req.body.precio !== undefined && req.body.precio !== null && req.body.precio !== "";
+    const pricePayload = normalizeServicePrice(req.body);
 
-    if (!nombre || (hasPrecio && precio === null)) {
+    if (!nombre || !pricePayload) {
       return res.status(400).json({ message: "Nombre o precio de servicio invalido." });
     }
 
-    const servicio = await createServicio({ nombre, precio });
+    const servicio = await createServicio({ nombre, ...pricePayload });
     return res.status(201).json(servicio);
   } catch (error) {
     return next(error);
@@ -50,14 +53,13 @@ export async function postServicio(req, res, next) {
 export async function putServicio(req, res, next) {
   try {
     const nombre = sanitizeText(req.body.nombre, 120);
-    const precio = normalizeNullablePrice(req.body.precio);
-    const hasPrecio = req.body.precio !== undefined && req.body.precio !== null && req.body.precio !== "";
+    const pricePayload = normalizeServicePrice(req.body);
 
-    if (!nombre || (hasPrecio && precio === null)) {
+    if (!nombre || !pricePayload) {
       return res.status(400).json({ message: "Nombre o precio de servicio invalido." });
     }
 
-    const servicio = await updateServicio(req.params.id, { nombre, precio });
+    const servicio = await updateServicio(req.params.id, { nombre, ...pricePayload });
 
     if (!servicio) {
       return res.status(404).json({ message: "Servicio not found" });
@@ -67,6 +69,28 @@ export async function putServicio(req, res, next) {
   } catch (error) {
     return next(error);
   }
+}
+
+function normalizeServicePrice(body) {
+  const precioTipo = normalizePriceType(body.precio_tipo ?? body.precioTipo);
+  const precioMin = normalizeNullablePrice(body.precio_min ?? body.precioMin ?? body.precio);
+  const precioMax = normalizeNullablePrice(body.precio_max ?? body.precioMax);
+
+  if (!precioTipo) return null;
+
+  if (precioTipo === "consultar") {
+    return { precioTipo, precioMin: null, precioMax: null };
+  }
+
+  if ((precioTipo === "fijo" || precioTipo === "desde") && precioMin !== null) {
+    return { precioTipo, precioMin, precioMax: null };
+  }
+
+  if (precioTipo === "rango" && precioMin !== null && precioMax !== null && precioMax > precioMin) {
+    return { precioTipo, precioMin, precioMax };
+  }
+
+  return null;
 }
 
 export async function removeServicio(req, res, next) {

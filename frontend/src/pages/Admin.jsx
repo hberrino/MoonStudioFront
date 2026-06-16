@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api.js";
 
-const emptyServiceForm = { nombre: "", precio: "", idProfesional: "" };
+const emptyServiceForm = {
+  nombre: "",
+  precioTipo: "consultar",
+  precioMin: "",
+  precioMax: "",
+  idProfesional: "",
+};
 const emptyProfessionalForm = { nombre: "" };
 const emptyBlockForm = {
   fecha: "",
@@ -169,13 +175,16 @@ export default function Admin() {
   async function handlePriceSubmit(event, service) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const precio = formData.get("precio");
 
     try {
       setError("");
       const updatedService = await api.updateServicio(service.id, {
         nombre: service.nombre,
-        precio: precio === "" ? null : Number(precio),
+        ...buildServicePricePayload({
+          precioTipo: formData.get("precioTipo"),
+          precioMin: formData.get("precioMin"),
+          precioMax: formData.get("precioMax"),
+        }),
       });
       setServicios((currentServicios) =>
         currentServicios.map((item) => (item.id === updatedService.id ? updatedService : item)),
@@ -213,7 +222,7 @@ export default function Admin() {
       setError("");
       const createdService = await api.createServicio({
         nombre: serviceForm.nombre,
-        precio: serviceForm.precio === "" ? null : Number(serviceForm.precio),
+        ...buildServicePricePayload(serviceForm),
       });
       const currentProfessionalServices = await api.getProfesionalServicios(serviceForm.idProfesional);
       const servicioIds = [
@@ -573,15 +582,51 @@ export default function Admin() {
                   required
                   value={serviceForm.nombre}
                 />
-                <input
+                <select
                   className="form-input form-input-boxed"
-                  min="0"
-                  onChange={(event) => setServiceForm({ ...serviceForm, precio: event.target.value })}
-                  placeholder="Precio"
-                  step="0.01"
-                  type="number"
-                  value={serviceForm.precio}
-                />
+                  onChange={(event) =>
+                    setServiceForm({
+                      ...serviceForm,
+                      precioTipo: event.target.value,
+                      precioMin: event.target.value === "consultar" ? "" : serviceForm.precioMin,
+                      precioMax: event.target.value === "rango" ? serviceForm.precioMax : "",
+                    })
+                  }
+                  value={serviceForm.precioTipo}
+                >
+                  <option value="consultar">Precio a consultar</option>
+                  <option value="fijo">Precio fijo</option>
+                  <option value="desde">Desde</option>
+                  <option value="rango">Rango</option>
+                </select>
+                {serviceForm.precioTipo !== "consultar" ? (
+                  <input
+                    className="form-input form-input-boxed"
+                    min="0"
+                    onChange={(event) =>
+                      setServiceForm({ ...serviceForm, precioMin: event.target.value })
+                    }
+                    placeholder={serviceForm.precioTipo === "rango" ? "Precio minimo" : "Precio"}
+                    required
+                    step="0.01"
+                    type="number"
+                    value={serviceForm.precioMin}
+                  />
+                ) : null}
+                {serviceForm.precioTipo === "rango" ? (
+                  <input
+                    className="form-input form-input-boxed"
+                    min="0"
+                    onChange={(event) =>
+                      setServiceForm({ ...serviceForm, precioMax: event.target.value })
+                    }
+                    placeholder="Precio maximo"
+                    required
+                    step="0.01"
+                    type="number"
+                    value={serviceForm.precioMax}
+                  />
+                ) : null}
                 <select
                   className="form-input form-input-boxed"
                   onChange={(event) =>
@@ -617,13 +662,35 @@ export default function Admin() {
                         key={service.id}
                         onSubmit={(event) => handlePriceSubmit(event, service)}
                       >
-                        <span>{service.nombre}</span>
+                        <span>
+                          {service.nombre}
+                          <small>{formatServicePrice(service)}</small>
+                        </span>
+                        <select
+                          className="form-input form-input-boxed"
+                          defaultValue={service.precio_tipo ?? "consultar"}
+                          name="precioTipo"
+                        >
+                          <option value="consultar">Consultar</option>
+                          <option value="fijo">Fijo</option>
+                          <option value="desde">Desde</option>
+                          <option value="rango">Rango</option>
+                        </select>
                         <input
                           className="form-input form-input-boxed"
-                          defaultValue={service.precio ?? ""}
+                          defaultValue={service.precio_min ?? ""}
                           min="0"
-                          name="precio"
-                          placeholder="Sin precio"
+                          name="precioMin"
+                          placeholder="Minimo"
+                          step="0.01"
+                          type="number"
+                        />
+                        <input
+                          className="form-input form-input-boxed"
+                          defaultValue={service.precio_max ?? ""}
+                          min="0"
+                          name="precioMax"
+                          placeholder="Maximo"
                           step="0.01"
                           type="number"
                         />
@@ -905,6 +972,34 @@ export default function Admin() {
 
 function getDayLabel(day) {
   return diasSemana.find((item) => item.value === day)?.label || "";
+}
+
+function buildServicePricePayload(values) {
+  const precioTipo = values.precioTipo || "consultar";
+  const precioMin = values.precioMin === "" || values.precioMin === null ? null : Number(values.precioMin);
+  const precioMax = values.precioMax === "" || values.precioMax === null ? null : Number(values.precioMax);
+
+  return {
+    precio_tipo: precioTipo,
+    precio_min: precioTipo === "consultar" ? null : precioMin,
+    precio_max: precioTipo === "rango" ? precioMax : null,
+  };
+}
+
+function formatServicePrice(service) {
+  const priceType = service.precio_tipo || "consultar";
+  const min = formatCurrency(service.precio_min ?? service.precio);
+  const max = formatCurrency(service.precio_max);
+
+  if (priceType === "fijo" && min) return min;
+  if (priceType === "desde" && min) return `Desde ${min}`;
+  if (priceType === "rango" && min && max) return `${min} a ${max}`;
+  return "Precio a consultar";
+}
+
+function formatCurrency(value) {
+  if (value === null || value === undefined || value === "") return "";
+  return `$${Number(value).toLocaleString("es-AR")}`;
 }
 
 function formatDate(value) {

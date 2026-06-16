@@ -357,8 +357,8 @@ export default function Booking() {
                       />
                       <span className="inline-flex rounded-full border border-outline-variant px-4 py-3 text-sm text-on-surface-variant transition peer-checked:border-secondary peer-checked:bg-secondary/10 peer-checked:text-secondary">
                         {service.nombre}
-                        {service.precio
-                          ? ` · $${Number(service.precio).toLocaleString("es-AR")}`
+                        {formatServicePrice(service) !== "Precio a consultar"
+                          ? ` · ${formatServicePrice(service)}`
                           : ""}
                       </span>
                     </label>
@@ -617,9 +617,19 @@ function formatServiceOption(service) {
 }
 
 function formatServicePrice(service) {
-  return service.precio
-    ? `$${Number(service.precio).toLocaleString("es-AR")}`
-    : "Precio a consultar";
+  const priceType = service.precio_tipo || "consultar";
+  const min = formatCurrency(service.precio_min ?? service.precio);
+  const max = formatCurrency(service.precio_max);
+
+  if (priceType === "fijo" && min) return min;
+  if (priceType === "desde" && min) return `Desde ${min}`;
+  if (priceType === "rango" && min && max) return `${min} a ${max}`;
+  return "Precio a consultar";
+}
+
+function formatCurrency(value) {
+  if (value === null || value === undefined || value === "") return "";
+  return `$${Number(value).toLocaleString("es-AR")}`;
 }
 
 function buildDateOptions(totalDays) {
