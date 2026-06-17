@@ -1709,9 +1709,22 @@ summary:focus-visible {
   padding: 0.85rem 1rem;
 }
 
+.booking-service-summary > div {
+  display: grid;
+  gap: 0.22rem;
+  min-width: 0;
+}
+
 .booking-service-summary span {
   color: #675a48;
   font-weight: 500;
+}
+
+.booking-service-summary small {
+  color: #8a8073;
+  display: block;
+  font-size: 0.76rem;
+  line-height: 1.35;
 }
 
 .booking-service-summary strong {

@@ -53,6 +53,22 @@ export default function Booking() {
       (service) => (service.seccion || "peluqueria") === selectedServiceSection,
     );
   }, [selectedServiceSection, servicios]);
+  const profesionalesPorServicio = useMemo(() => {
+    const serviceMap = {};
+
+    profesionales.forEach((professional) => {
+      const professionalServices = serviciosPorProfesional[professional.id] || [];
+      professionalServices.forEach((serviceId) => {
+        if (!serviceMap[serviceId]) serviceMap[serviceId] = [];
+        serviceMap[serviceId].push(professional.nombre);
+      });
+    });
+
+    return serviceMap;
+  }, [profesionales, serviciosPorProfesional]);
+  const selectedServiceProfessionals = selectedServiceData
+    ? profesionalesPorServicio[String(selectedServiceData.id)] || []
+    : [];
 
   useEffect(() => {
     let isMounted = true;
@@ -365,14 +381,21 @@ export default function Booking() {
                     </option>
                     {filteredServicios.map((service) => (
                       <option key={service.id} value={service.id}>
-                        {formatServiceOption(service)}
+                        {formatServiceOption(service, profesionalesPorServicio[String(service.id)])}
                       </option>
                     ))}
                   </select>
                 </label>
                 {selectedServiceData ? (
                   <div className="booking-service-summary">
-                    <span>{selectedServiceData.nombre}</span>
+                    <div>
+                      <span>{selectedServiceData.nombre}</span>
+                      {selectedServiceProfessionals.length > 0 ? (
+                        <small>
+                          Asignado a {formatProfessionalList(selectedServiceProfessionals)}
+                        </small>
+                      ) : null}
+                    </div>
                     <strong>{formatServicePrice(selectedServiceData)}</strong>
                   </div>
                 ) : (
@@ -653,9 +676,20 @@ function validateClientData(values) {
   return errors;
 }
 
-function formatServiceOption(service) {
+function formatServiceOption(service, professionalNames = []) {
   const price = formatServicePrice(service);
-  return price === "Precio a consultar" ? service.nombre : `${service.nombre} - ${price}`;
+  const serviceLabel =
+    price === "Precio a consultar" ? service.nombre : `${service.nombre} - ${price}`;
+  const professionalsLabel = professionalNames.length
+    ? ` - ${formatProfessionalList(professionalNames)}`
+    : "";
+
+  return `${serviceLabel}${professionalsLabel}`;
+}
+
+function formatProfessionalList(professionalNames = []) {
+  if (professionalNames.length <= 2) return professionalNames.join(" y ");
+  return `${professionalNames.slice(0, -1).join(", ")} y ${professionalNames.at(-1)}`;
 }
 
 function formatServicePrice(service) {
