@@ -2109,6 +2109,17 @@ summary:focus-visible {
   transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
 }
 
+.admin-service-actions {
+  min-width: 0;
+}
+
+.admin-service-actions .button-secondary,
+.admin-service-actions .admin-danger-button,
+.admin-row-actions .admin-compact-button {
+  min-height: 2.55rem;
+  padding: 0.72rem 0.9rem;
+}
+
 .admin-danger-button:hover {
   background: #802a2a;
   border-color: #802a2a;
@@ -2157,6 +2168,12 @@ summary:focus-visible {
   accent-color: #675a48;
   height: 1rem;
   width: 1rem;
+}
+
+.admin-service-filter {
+  display: block;
+  margin-bottom: 1rem;
+  max-width: 360px;
 }
 
 .admin-list-row {
@@ -2264,6 +2281,10 @@ button:disabled {
     padding: 0.75rem;
   }
 
+  .admin-service-filter {
+    max-width: none;
+  }
+
   .admin-price-row .form-input {
     padding: 0.72rem 0.85rem;
   }
@@ -2276,11 +2297,26 @@ button:disabled {
 
   .admin-price-row .button-secondary,
   .admin-price-row .admin-danger-button,
-  .admin-price-row .form-input,
   .admin-list-row .admin-danger-button,
   .admin-turno .form-input,
-  .admin-row-actions,
-  .admin-compact-button {
+  .admin-price-row .form-input {
+    width: 100%;
+  }
+
+  .admin-row-actions {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .admin-row-actions .button-secondary,
+  .admin-row-actions .admin-danger-button,
+  .admin-row-actions .admin-compact-button {
+    font-size: 0.72rem;
+    justify-content: center;
+    min-height: 2.5rem;
+    padding: 0.68rem 0.65rem;
     width: 100%;
   }
 
@@ -2355,8 +2391,7 @@ button:disabled {
       minmax(120px, 0.64fr)
       minmax(100px, 0.5fr)
       minmax(100px, 0.5fr)
-      auto
-      auto;
+      minmax(180px, auto);
   }
 
   .admin-list-row {

@@ -59,6 +59,7 @@ export default function Admin() {
   const [serviceForm, setServiceForm] = useState(emptyServiceForm);
   const [professionalForm, setProfessionalForm] = useState(emptyProfessionalForm);
   const [blockForm, setBlockForm] = useState(emptyBlockForm);
+  const [serviceSectionFilter, setServiceSectionFilter] = useState("");
   const [turnosProfessionalFilter, setTurnosProfessionalFilter] = useState("");
   const [turnosTimeFilter, setTurnosTimeFilter] = useState("upcoming");
   const [availabilityForm, setAvailabilityForm] = useState({
@@ -112,6 +113,11 @@ export default function Admin() {
 
     return [...filteredTurnos].sort(compareTurnosForAgenda);
   }, [turnos, turnosProfessionalFilter, turnosTimeFilter]);
+
+  const filteredServicios = useMemo(() => {
+    if (!serviceSectionFilter) return servicios;
+    return servicios.filter((service) => (service.seccion || "peluqueria") === serviceSectionFilter);
+  }, [serviceSectionFilter, servicios]);
 
   const refreshAdminData = useCallback(async () => {
     try {
@@ -715,12 +721,29 @@ export default function Admin() {
                 <summary>
                   <span>
                     <strong>Servicios cargados</strong>
-                    <small>{servicios.length} servicios</small>
+                    <small>
+                      {filteredServicios.length} de {servicios.length} servicios
+                    </small>
                   </span>
                 </summary>
                 <div className="admin-disclosure-body">
+                  <label className="admin-service-filter">
+                    <span className="form-label">Sector</span>
+                    <select
+                      className="form-input form-input-boxed"
+                      onChange={(event) => setServiceSectionFilter(event.target.value)}
+                      value={serviceSectionFilter}
+                    >
+                      <option value="">Todos los sectores</option>
+                      {serviceSections.map((section) => (
+                        <option key={section.value} value={section.value}>
+                          {section.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <div className="admin-scroll-list">
-                    {servicios.map((service) => (
+                    {filteredServicios.map((service) => (
                       <form
                         className="admin-price-row"
                         key={service.id}
@@ -773,18 +796,25 @@ export default function Admin() {
                           step="0.01"
                           type="number"
                         />
-                        <button className="button-secondary" type="submit">
-                          Guardar
-                        </button>
-                        <button
-                          className="admin-danger-button"
-                          onClick={() => handleDeleteService(service)}
-                          type="button"
-                        >
-                          Eliminar
-                        </button>
+                        <div className="admin-row-actions admin-service-actions">
+                          <button className="button-secondary" type="submit">
+                            Guardar
+                          </button>
+                          <button
+                            className="admin-danger-button"
+                            onClick={() => handleDeleteService(service)}
+                            type="button"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
                       </form>
                     ))}
+                    {filteredServicios.length === 0 ? (
+                      <p className="text-on-surface-variant">
+                        No hay servicios cargados en este sector.
+                      </p>
+                    ) : null}
                   </div>
                 </div>
               </details>
