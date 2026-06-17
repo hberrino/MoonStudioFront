@@ -2129,6 +2129,12 @@ summary:focus-visible {
   margin-top: 0.2rem;
 }
 
+.admin-price-row .admin-assignment-list {
+  color: #5f5448;
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
 .admin-checkbox-group {
   background: #f5f3ee;
   border: 1px solid rgba(207, 197, 186, 0.65);
@@ -2254,6 +2260,20 @@ button:disabled {
     gap: 0.85rem;
   }
 
+  .admin-price-row {
+    padding: 0.75rem;
+  }
+
+  .admin-price-row .form-input {
+    padding: 0.72rem 0.85rem;
+  }
+
+  .admin-price-row .button-secondary,
+  .admin-price-row .admin-danger-button {
+    min-height: 2.75rem;
+    padding: 0.72rem 0.85rem;
+  }
+
   .admin-price-row .button-secondary,
   .admin-price-row .admin-danger-button,
   .admin-price-row .form-input,
@@ -2262,11 +2282,6 @@ button:disabled {
   .admin-row-actions,
   .admin-compact-button {
     width: 100%;
-  }
-
-  .admin-price-row .button-secondary,
-  .admin-price-row .admin-danger-button {
-    padding: 0.9rem 1rem;
   }
 
   .admin-disclosure summary {

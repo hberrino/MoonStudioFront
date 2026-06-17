@@ -53,6 +53,7 @@ export default function Admin() {
   const [turnos, setTurnos] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [profesionales, setProfesionales] = useState([]);
+  const [servicioProfesionales, setServicioProfesionales] = useState({});
   const [disponibilidad, setDisponibilidad] = useState([]);
   const [bloqueos, setBloqueos] = useState([]);
   const [serviceForm, setServiceForm] = useState(emptyServiceForm);
@@ -77,6 +78,7 @@ export default function Admin() {
     setTurnos([]);
     setServicios([]);
     setProfesionales([]);
+    setServicioProfesionales({});
     setDisponibilidad([]);
     setBloqueos([]);
     setMessage("");
@@ -119,10 +121,11 @@ export default function Admin() {
         api.getServicios(),
         api.getProfesionales(),
       ]);
+      const nextServicioProfesionales = await buildServicioProfesionalesMap(nextProfesionales);
       setTurnos(nextTurnos);
       setServicios(nextServicios);
       setProfesionales(nextProfesionales);
-
+      setServicioProfesionales(nextServicioProfesionales);
     } catch (requestError) {
       handleAdminRequestError(requestError);
     }
@@ -214,6 +217,11 @@ export default function Admin() {
       setServicios((currentServicios) =>
         currentServicios.filter((item) => item.id !== service.id),
       );
+      setServicioProfesionales((currentMap) => {
+        const nextMap = { ...currentMap };
+        delete nextMap[service.id];
+        return nextMap;
+      });
       setTurnos((currentTurnos) =>
         currentTurnos.filter((turno) => turno.id_servicio !== service.id),
       );
@@ -251,6 +259,15 @@ export default function Admin() {
         }),
       );
       setServicios((currentServicios) => [...currentServicios, createdService]);
+      setServicioProfesionales((currentMap) => ({
+        ...currentMap,
+        [createdService.id]: serviceForm.idProfesionales
+          .map((idProfesional) =>
+            profesionales.find((professional) => String(professional.id) === idProfesional),
+          )
+          .filter(Boolean)
+          .map((professional) => professional.nombre),
+      }));
       setServiceForm(emptyServiceForm);
       setMessage("Servicio agregado y vinculado a los profesionales seleccionados.");
     } catch (requestError) {
@@ -291,6 +308,14 @@ export default function Admin() {
       );
       setTurnos((currentTurnos) =>
         currentTurnos.filter((turno) => turno.id_profesional !== professional.id),
+      );
+      setServicioProfesionales((currentMap) =>
+        Object.fromEntries(
+          Object.entries(currentMap).map(([serviceId, assignments]) => [
+            serviceId,
+            assignments.filter((name) => name !== professional.nombre),
+          ]),
+        ),
       );
       if (availabilityForm.idProfesional === String(professional.id)) {
         setAvailabilityForm((currentForm) => ({
@@ -705,6 +730,9 @@ export default function Admin() {
                           {service.nombre}
                           <small>{getServiceSectionLabel(service.seccion)}</small>
                           <small>{formatServicePrice(service)}</small>
+                          <small className="admin-assignment-list">
+                            {formatServiceAssignments(servicioProfesionales[service.id])}
+                          </small>
                         </span>
                         <select
                           className="form-input form-input-boxed"
@@ -1025,6 +1053,26 @@ function getDayLabel(day) {
   return diasSemana.find((item) => item.value === day)?.label || "";
 }
 
+async function buildServicioProfesionalesMap(profesionales) {
+  const entries = await Promise.all(
+    profesionales.map(async (professional) => {
+      try {
+        const professionalServices = await api.getProfesionalServicios(professional.id);
+        return professionalServices.map((service) => [service.id, professional.nombre]);
+      } catch {
+        return [];
+      }
+    }),
+  );
+
+  return entries.flat().reduce((map, [serviceId, professionalName]) => {
+    return {
+      ...map,
+      [serviceId]: [...(map[serviceId] || []), professionalName],
+    };
+  }, {});
+}
+
 function buildServicePricePayload(values) {
   const precioTipo = values.precioTipo || "consultar";
   const precioMin = values.precioMin === "" || values.precioMin === null ? null : Number(values.precioMin);
@@ -1044,6 +1092,11 @@ function getServiceSectionLabel(value) {
 function toggleSelectedValue(values, value, isSelected) {
   if (isSelected) return [...new Set([...values, value])];
   return values.filter((item) => item !== value);
+}
+
+function formatServiceAssignments(assignments = []) {
+  if (assignments.length === 0) return "Sin profesionales asignados";
+  return `Asignado a: ${assignments.join(", ")}`;
 }
 
 function formatServicePrice(service) {
