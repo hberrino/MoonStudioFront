@@ -7,7 +7,7 @@ const emptyServiceForm = {
   precioTipo: "consultar",
   precioMin: "",
   precioMax: "",
-  idProfesional: "",
+  idProfesionales: [],
 };
 const emptyProfessionalForm = { nombre: "" };
 const emptyBlockForm = {
@@ -226,6 +226,11 @@ export default function Admin() {
   async function handleCreateService(event) {
     event.preventDefault();
 
+    if (serviceForm.idProfesionales.length === 0) {
+      setError("Selecciona al menos un profesional para vincular el servicio.");
+      return;
+    }
+
     try {
       setError("");
       const createdService = await api.createServicio({
@@ -233,17 +238,21 @@ export default function Admin() {
         seccion: serviceForm.seccion,
         ...buildServicePricePayload(serviceForm),
       });
-      const currentProfessionalServices = await api.getProfesionalServicios(serviceForm.idProfesional);
-      const servicioIds = [
-        ...new Set([
-          ...currentProfessionalServices.map((service) => service.id),
-          createdService.id,
-        ]),
-      ];
-      await api.updateProfesionalServicios(serviceForm.idProfesional, servicioIds);
+      await Promise.all(
+        serviceForm.idProfesionales.map(async (idProfesional) => {
+          const currentProfessionalServices = await api.getProfesionalServicios(idProfesional);
+          const servicioIds = [
+            ...new Set([
+              ...currentProfessionalServices.map((service) => service.id),
+              createdService.id,
+            ]),
+          ];
+          await api.updateProfesionalServicios(idProfesional, servicioIds);
+        }),
+      );
       setServicios((currentServicios) => [...currentServicios, createdService]);
       setServiceForm(emptyServiceForm);
-      setMessage("Servicio agregado y vinculado al profesional.");
+      setMessage("Servicio agregado y vinculado a los profesionales seleccionados.");
     } catch (requestError) {
       handleAdminRequestError(requestError);
     }
@@ -650,21 +659,28 @@ export default function Admin() {
                     value={serviceForm.precioMax}
                   />
                 ) : null}
-                <select
-                  className="form-input form-input-boxed"
-                  onChange={(event) =>
-                    setServiceForm({ ...serviceForm, idProfesional: event.target.value })
-                  }
-                  required
-                  value={serviceForm.idProfesional}
-                >
-                  <option value="">Profesional</option>
+                <div className="admin-checkbox-group">
+                  <span className="form-label">Profesionales</span>
                   {profesionales.map((professional) => (
-                    <option key={professional.id} value={professional.id}>
-                      {professional.nombre}
-                    </option>
+                    <label className="admin-checkbox-option" key={professional.id}>
+                      <input
+                        checked={serviceForm.idProfesionales.includes(String(professional.id))}
+                        onChange={(event) =>
+                          setServiceForm({
+                            ...serviceForm,
+                            idProfesionales: toggleSelectedValue(
+                              serviceForm.idProfesionales,
+                              String(professional.id),
+                              event.target.checked,
+                            ),
+                          })
+                        }
+                        type="checkbox"
+                      />
+                      <span>{professional.nombre}</span>
+                    </label>
                   ))}
-                </select>
+                </div>
                 <button className="button-primary" type="submit">
                   Agregar servicio
                 </button>
@@ -1023,6 +1039,11 @@ function buildServicePricePayload(values) {
 
 function getServiceSectionLabel(value) {
   return serviceSections.find((section) => section.value === value)?.label || "Peluquería";
+}
+
+function toggleSelectedValue(values, value, isSelected) {
+  if (isSelected) return [...new Set([...values, value])];
+  return values.filter((item) => item !== value);
 }
 
 function formatServicePrice(service) {
