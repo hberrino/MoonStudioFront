@@ -1,23 +1,35 @@
 import { pool } from "../config/db.js";
 
 export async function findAllProfesionales() {
-  const [rows] = await pool.query("SELECT id, nombre FROM profesionales ORDER BY id");
+  const [rows] = await pool.query("SELECT id, nombre, email FROM profesionales ORDER BY id");
   return rows;
 }
 
 export async function findProfesionalById(id) {
-  const [rows] = await pool.query("SELECT id, nombre FROM profesionales WHERE id = ?", [id]);
+  const [rows] = await pool.query("SELECT id, nombre, email FROM profesionales WHERE id = ?", [id]);
   return rows[0] || null;
 }
 
 export async function createProfesional({ nombre }) {
-  const [result] = await pool.query("INSERT INTO profesionales (nombre) VALUES (?)", [nombre]);
+  const [result] = await pool.query("INSERT INTO profesionales (nombre, email) VALUES (?, NULL)", [
+    nombre,
+  ]);
   return findProfesionalById(result.insertId);
 }
 
 export async function updateProfesional(id, { nombre }) {
   const [result] = await pool.query("UPDATE profesionales SET nombre = ? WHERE id = ?", [
     nombre,
+    id,
+  ]);
+
+  if (result.affectedRows === 0) return null;
+  return findProfesionalById(id);
+}
+
+export async function updateProfesionalEmail(id, { email = null }) {
+  const [result] = await pool.query("UPDATE profesionales SET email = ? WHERE id = ?", [
+    email,
     id,
   ]);
 

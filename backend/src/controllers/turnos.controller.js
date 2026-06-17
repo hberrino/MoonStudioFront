@@ -6,8 +6,9 @@ import {
   findTurnoById,
   updateTurnoEstado,
 } from "../models/turno.model.js";
-import { hasServicioAsignado } from "../models/profesional.model.js";
+import { findProfesionalById, hasServicioAsignado } from "../models/profesional.model.js";
 import { getAvailableTimes } from "../services/availability.service.js";
+import { sendTurnoNotificationEmail } from "../services/email.service.js";
 import {
   isValidClientName,
   isValidDate,
@@ -118,6 +119,12 @@ export async function postTurno(req, res, next) {
     }
 
     const turno = await createTurno(normalizedTurno);
+
+    findProfesionalById(normalizedTurno.idProfesional)
+      .then((profesional) => sendTurnoNotificationEmail({ profesional, turno }))
+      .catch((emailError) => {
+        console.error("No se pudo enviar el aviso de turno:", emailError);
+      });
 
     return res.status(201).json(turno);
   } catch (error) {

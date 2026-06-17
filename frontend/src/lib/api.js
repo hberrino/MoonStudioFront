@@ -51,10 +51,16 @@ export const api = {
       method: "DELETE",
     }),
   getProfesionales: () => apiFetch("/profesionales"),
+  getProfesionalesAdmin: () => apiFetch("/profesionales/admin"),
   createProfesional: (payload) =>
     apiFetch("/profesionales", {
       method: "POST",
       body: JSON.stringify(payload),
+    }),
+  updateProfesionalEmail: (id, email) =>
+    apiFetch(`/profesionales/${id}/email`, {
+      method: "PATCH",
+      body: JSON.stringify({ email }),
     }),
   deleteProfesional: (id) =>
     apiFetch(`/profesionales/${id}`, {

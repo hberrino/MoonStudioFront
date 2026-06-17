@@ -34,6 +34,10 @@ export function isValidEmail(value) {
   return EMAIL_REGEX.test(email) && ALLOWED_EMAIL_DOMAINS.has(domain);
 }
 
+export function isValidEmailFormat(value) {
+  return EMAIL_REGEX.test(normalizeEmail(value));
+}
+
 export function isValidPhone(value) {
   return PHONE_REGEX.test(normalizePhone(value));
 }

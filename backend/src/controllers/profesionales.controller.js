@@ -6,10 +6,31 @@ import {
   findServiciosByProfesional,
   replaceServiciosForProfesional,
   updateProfesional,
+  updateProfesionalEmail,
 } from "../models/profesional.model.js";
-import { isValidClientName, isValidPositiveInteger, sanitizeText } from "../utils/validation.js";
+import {
+  isValidClientName,
+  isValidEmailFormat,
+  isValidPositiveInteger,
+  normalizeEmail,
+  sanitizeText,
+} from "../utils/validation.js";
+
+function toPublicProfesional(profesional) {
+  const { email: _email, ...publicProfesional } = profesional;
+  return publicProfesional;
+}
 
 export async function getProfesionales(_req, res, next) {
+  try {
+    const profesionales = await findAllProfesionales();
+    res.json(profesionales.map(toPublicProfesional));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getProfesionalesAdmin(_req, res, next) {
   try {
     const profesionales = await findAllProfesionales();
     res.json(profesionales);
@@ -26,7 +47,7 @@ export async function getProfesional(req, res, next) {
       return res.status(404).json({ message: "Profesional not found" });
     }
 
-    return res.json(profesional);
+    return res.json(toPublicProfesional(profesional));
   } catch (error) {
     return next(error);
   }
@@ -56,6 +77,27 @@ export async function putProfesional(req, res, next) {
     }
 
     const profesional = await updateProfesional(req.params.id, { nombre });
+
+    if (!profesional) {
+      return res.status(404).json({ message: "Profesional not found" });
+    }
+
+    return res.json(profesional);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function putProfesionalEmail(req, res, next) {
+  try {
+    const email = normalizeEmail(req.body.email);
+    const nextEmail = email ? email : null;
+
+    if (nextEmail && !isValidEmailFormat(nextEmail)) {
+      return res.status(400).json({ message: "Ingresa un correo valido." });
+    }
+
+    const profesional = await updateProfesionalEmail(req.params.id, { email: nextEmail });
 
     if (!profesional) {
       return res.status(404).json({ message: "Profesional not found" });

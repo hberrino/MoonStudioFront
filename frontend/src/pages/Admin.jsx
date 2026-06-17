@@ -10,6 +10,7 @@ const emptyServiceForm = {
   idProfesionales: [],
 };
 const emptyProfessionalForm = { nombre: "" };
+const emptyProfileForm = { idProfesional: "", email: "" };
 const emptyBlockForm = {
   fecha: "",
   horaInicio: "15:00",
@@ -58,6 +59,7 @@ export default function Admin() {
   const [bloqueos, setBloqueos] = useState([]);
   const [serviceForm, setServiceForm] = useState(emptyServiceForm);
   const [professionalForm, setProfessionalForm] = useState(emptyProfessionalForm);
+  const [profileForm, setProfileForm] = useState(emptyProfileForm);
   const [blockForm, setBlockForm] = useState(emptyBlockForm);
   const [serviceSectionFilter, setServiceSectionFilter] = useState("");
   const [turnosProfessionalFilter, setTurnosProfessionalFilter] = useState("");
@@ -80,6 +82,7 @@ export default function Admin() {
     setServicios([]);
     setProfesionales([]);
     setServicioProfesionales({});
+    setProfileForm(emptyProfileForm);
     setDisponibilidad([]);
     setBloqueos([]);
     setMessage("");
@@ -125,7 +128,7 @@ export default function Admin() {
       const [nextTurnos, nextServicios, nextProfesionales] = await Promise.all([
         api.getTurnos(),
         api.getServicios(),
-        api.getProfesionales(),
+        api.getProfesionalesAdmin(),
       ]);
       const nextServicioProfesionales = await buildServicioProfesionalesMap(nextProfesionales);
       setTurnos(nextTurnos);
@@ -290,6 +293,35 @@ export default function Admin() {
       setProfesionales((currentProfesionales) => [...currentProfesionales, createdProfessional]);
       setProfessionalForm(emptyProfessionalForm);
       setMessage("Profesional agregado.");
+    } catch (requestError) {
+      handleAdminRequestError(requestError);
+    }
+  }
+
+  async function handleProfileEmailSubmit(event) {
+    event.preventDefault();
+
+    if (!profileForm.idProfesional) {
+      setError("Selecciona un profesional.");
+      return;
+    }
+
+    try {
+      setError("");
+      const updatedProfessional = await api.updateProfesionalEmail(
+        profileForm.idProfesional,
+        profileForm.email,
+      );
+      setProfesionales((currentProfesionales) =>
+        currentProfesionales.map((professional) =>
+          professional.id === updatedProfessional.id ? updatedProfessional : professional,
+        ),
+      );
+      setProfileForm({
+        idProfesional: String(updatedProfessional.id),
+        email: updatedProfessional.email || "",
+      });
+      setMessage("Correo actualizado.");
     } catch (requestError) {
       handleAdminRequestError(requestError);
     }
@@ -500,6 +532,7 @@ export default function Admin() {
             <option value="turnos">Turnos</option>
             <option value="servicios">Servicios y precios</option>
             <option value="disponibilidad">Disponibilidad</option>
+            <option value="perfil">Mi perfil</option>
             <option value="actualizar">Actualizar datos</option>
           </select>
         </label>
@@ -525,6 +558,13 @@ export default function Admin() {
             type="button"
           >
             Disponibilidad
+          </button>
+          <button
+            className={`admin-tab ${activeTab === "perfil" ? "admin-tab-active" : ""}`}
+            onClick={() => setActiveTab("perfil")}
+            type="button"
+          >
+            Mi perfil
           </button>
           <button className="admin-tab" onClick={refreshAdminData} type="button">
             Actualizar
@@ -861,6 +901,59 @@ export default function Admin() {
                 ))}
               </div>
             </div>
+          </section>
+        ) : activeTab === "perfil" ? (
+          <section className="admin-panel mt-8">
+            <h2 className="admin-panel-title">Mi perfil</h2>
+            <p className="mt-2 text-on-surface-variant">
+              Carga el correo de cada profesional para futuras notificaciones de turnos.
+            </p>
+            <form className="admin-profile-form mt-6" onSubmit={handleProfileEmailSubmit}>
+              <label className="block">
+                <span className="form-label">Profesional</span>
+                <select
+                  className="form-input form-input-boxed"
+                  onChange={(event) => {
+                    const selectedProfessional = profesionales.find(
+                      (professional) => String(professional.id) === event.target.value,
+                    );
+                    setProfileForm({
+                      idProfesional: event.target.value,
+                      email: selectedProfessional?.email || "",
+                    });
+                  }}
+                  required
+                  value={profileForm.idProfesional}
+                >
+                  <option value="">Profesional</option>
+                  {profesionales.map((professional) => (
+                    <option key={professional.id} value={professional.id}>
+                      {professional.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="form-label">Correo</span>
+                <input
+                  className="form-input form-input-boxed"
+                  disabled={!profileForm.idProfesional}
+                  onChange={(event) =>
+                    setProfileForm({ ...profileForm, email: event.target.value })
+                  }
+                  placeholder="correo@ejemplo.com"
+                  type="email"
+                  value={profileForm.email}
+                />
+              </label>
+              <button className="button-primary" disabled={!profileForm.idProfesional} type="submit">
+                Guardar correo
+              </button>
+            </form>
+            <p className="mt-4 text-sm leading-relaxed text-on-surface-variant">
+              Si el correo queda vacio, el profesional seguira funcionando normalmente, solo sin
+              notificaciones por mail.
+            </p>
           </section>
         ) : (
           <section className="admin-panel mt-8">

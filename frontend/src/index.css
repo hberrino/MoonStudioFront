@@ -2176,6 +2176,13 @@ summary:focus-visible {
   max-width: 360px;
 }
 
+.admin-profile-form {
+  align-items: end;
+  display: grid;
+  gap: 0.9rem;
+  max-width: 620px;
+}
+
 .admin-list-row {
   align-items: center;
   background: #fbf9f4;
@@ -2282,6 +2289,10 @@ button:disabled {
   }
 
   .admin-service-filter {
+    max-width: none;
+  }
+
+  .admin-profile-form {
     max-width: none;
   }
 
@@ -2400,6 +2411,10 @@ button:disabled {
 
   .admin-professional-row {
     grid-template-columns: minmax(120px, 1fr) auto;
+  }
+
+  .admin-profile-form {
+    grid-template-columns: minmax(180px, 0.8fr) minmax(220px, 1fr) auto;
   }
 
   .admin-row-actions {

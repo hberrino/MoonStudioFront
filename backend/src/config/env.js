@@ -40,6 +40,10 @@ export const env = {
     name: process.env.ADMIN_NAME || "admin",
     password: process.env.ADMIN_PASSWORD || "",
   },
+  email: {
+    resendApiKey: process.env.RESEND_API_KEY?.trim() || "",
+    from: process.env.EMAIL_FROM?.trim() || "Moon Studio <turnos@moonstudio.com.ar>",
+  },
   db: {
     host: process.env.DB_HOST || "localhost",
     port: Number(process.env.DB_PORT) || 3306,

@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS servicios (
 
 CREATE TABLE IF NOT EXISTS profesionales (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  nombre VARCHAR(255) NOT NULL
+  nombre VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NULL
 );
 
 CREATE TABLE IF NOT EXISTS profesional_servicio (
