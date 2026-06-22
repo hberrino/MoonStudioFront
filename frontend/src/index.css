@@ -280,10 +280,11 @@ summary:focus-visible {
 }
 
 .footer-logo-link {
-  height: 5.4rem;
+  height: 6rem;
   justify-content: center;
+  justify-self: center;
   overflow: hidden;
-  width: min(100%, 13rem);
+  width: min(100%, 15rem);
 }
 
 .site-logo-link {
@@ -307,10 +308,10 @@ summary:focus-visible {
 
 .footer-logo-img {
   display: block;
-  height: 2.5rem;
+  height: 2.7rem;
   margin-inline: auto;
   object-fit: contain;
-  transform: scale(2.65);
+  transform: scale(2.95);
   transform-origin: center;
   width: auto;
 }
