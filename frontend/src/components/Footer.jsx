@@ -37,6 +37,16 @@ export default function Footer() {
           <p className="mt-2 text-[0.68rem] text-on-surface-variant">
             Desarrollado por Hernan Berrino
           </p>
+          <div className="footer-protection-badge" aria-label="Protegido por Cloudflare">
+            <span>Protegido por</span>
+            <img
+              alt="Cloudflare"
+              className="footer-cloudflare-logo"
+              decoding="async"
+              loading="lazy"
+              src="/icons/Cloudflare-logo.png"
+            />
+          </div>
         </div>
       </div>
     </footer>

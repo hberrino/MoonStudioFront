@@ -144,7 +144,6 @@ function ServiceCard({ index, service }) {
         <ProgressiveImage
           alt={service.title}
           className="service-slide-image"
-          eager={index === 0}
           src={service.image}
         />
       </div>

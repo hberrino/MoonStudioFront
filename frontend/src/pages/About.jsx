@@ -33,15 +33,30 @@ function advanceCarousel(carousel) {
 }
 
 function preloadImage(src) {
-  if (!src) return;
-  const image = new Image();
-  image.src = src;
+  return new Promise((resolve) => {
+    if (!src) {
+      resolve();
+      return;
+    }
+
+    const image = new Image();
+    image.onload = resolve;
+    image.onerror = resolve;
+    image.src = src;
+  });
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
 }
 
 export default function About() {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [isSpaceModalOpen, setIsSpaceModalOpen] = useState(false);
   const [spaceModalView, setSpaceModalView] = useState("studio");
+  const [pendingModal, setPendingModal] = useState("");
   const teamCarouselRef = useRef(null);
   const teamScrollPositionRef = useRef(0);
   const teamMobileIndexRef = useRef(0);
@@ -49,6 +64,7 @@ export default function About() {
   const isTeamPausedRef = useRef(false);
   const workCarouselRef = useRef(null);
   const spaceCarouselRef = useRef(null);
+  const modalRequestRef = useRef(0);
 
   const moveWorkCarousel = (direction) => {
     const carousel = workCarouselRef.current;
@@ -83,11 +99,47 @@ export default function About() {
   };
 
   const closeProfile = () => {
+    modalRequestRef.current += 1;
+    setPendingModal("");
     setSelectedPerson(null);
   };
 
   const closeSpaceModal = () => {
+    modalRequestRef.current += 1;
+    setPendingModal("");
     setIsSpaceModalOpen(false);
+  };
+
+  const openProfile = (person) => {
+    const requestId = modalRequestRef.current + 1;
+    modalRequestRef.current = requestId;
+    setPendingModal("profile");
+
+    Promise.all([
+      Promise.race([
+        Promise.all([preloadImage(person.image), preloadImage(person.workImages[0])]),
+        wait(900),
+      ]),
+      wait(260),
+    ]).then(() => {
+      if (modalRequestRef.current !== requestId) return;
+      setSelectedPerson(person);
+      setPendingModal("");
+    });
+  };
+
+  const openSpaceModal = (view) => {
+    const requestId = modalRequestRef.current + 1;
+    const firstImage = view === "map" ? "/images/espacio/map.jpg" : spaceImages[0];
+    modalRequestRef.current = requestId;
+    setPendingModal("space");
+
+    Promise.all([Promise.race([preloadImage(firstImage), wait(900)]), wait(260)]).then(() => {
+      if (modalRequestRef.current !== requestId) return;
+      setSpaceModalView(view);
+      setIsSpaceModalOpen(true);
+      setPendingModal("");
+    });
   };
 
   useEffect(() => {
@@ -149,7 +201,7 @@ export default function About() {
   }, []);
 
   useEffect(() => {
-    if (!selectedPerson && !isSpaceModalOpen) return undefined;
+    if (!selectedPerson && !isSpaceModalOpen && !pendingModal) return undefined;
 
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -167,7 +219,7 @@ export default function About() {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedPerson, isSpaceModalOpen]);
+  }, [selectedPerson, isSpaceModalOpen, pendingModal]);
 
   useEffect(() => {
     if (selectedPerson && workCarouselRef.current) {
@@ -272,7 +324,6 @@ export default function About() {
                 <ProgressiveImage
                   alt={`Retrato de ${person.name}`}
                   className="h-full w-full object-cover opacity-90 mix-blend-multiply"
-                  eager={index < 3}
                   src={person.image}
                 />
               </div>
@@ -283,7 +334,7 @@ export default function About() {
               <p className="mt-4 flex-1 leading-relaxed text-on-surface-variant">{person.bio}</p>
               <button
                 className="button-primary mt-6 w-full"
-                onClick={() => setSelectedPerson(person)}
+                onClick={() => openProfile(person)}
                 onFocus={() => preloadImage(person.workImages[0])}
                 onMouseEnter={() => preloadImage(person.workImages[0])}
                 onTouchStart={() => preloadImage(person.workImages[0])}
@@ -315,6 +366,18 @@ export default function About() {
           </button>
         </div>
       </div>
+
+      {pendingModal ? (
+        <div className="profile-modal-backdrop" aria-live="polite">
+          <div className="modal-preloader" role="status">
+            <div className="modal-preloader-brand">
+              <span>Moon</span>
+              <strong>Studio</strong>
+            </div>
+            <span className="modal-preloader-line" />
+          </div>
+        </div>
+      ) : null}
 
       {selectedPerson ? (
         <div
@@ -364,6 +427,7 @@ export default function About() {
                       <ProgressiveImage
                         alt={`Trabajo ${index + 1} de ${selectedPerson.name}`}
                         eager={index === 0}
+                        instant={index === 0}
                         src={image}
                       />
                     </figure>
@@ -435,11 +499,7 @@ export default function About() {
               className="space-link-button"
               onFocus={() => preloadImage(spaceImages[0])}
               onMouseEnter={() => preloadImage(spaceImages[0])}
-              onClick={() => {
-                preloadImage(spaceImages[0]);
-                setSpaceModalView("studio");
-                setIsSpaceModalOpen(true);
-              }}
+              onClick={() => openSpaceModal("studio")}
               type="button"
             >
               {">>"} Ver estudio {"<<"}
@@ -448,11 +508,7 @@ export default function About() {
               className="space-link-button space-mobile-directions"
               onFocus={() => preloadImage("/images/espacio/map.jpg")}
               onMouseEnter={() => preloadImage("/images/espacio/map.jpg")}
-              onClick={() => {
-                preloadImage("/images/espacio/map.jpg");
-                setSpaceModalView("map");
-                setIsSpaceModalOpen(true);
-              }}
+              onClick={() => openSpaceModal("map")}
               type="button"
             >
               {">>"} Como llegar {"<<"}
@@ -513,6 +569,7 @@ export default function About() {
                       <ProgressiveImage
                         alt={`Espacio Moon Studio ${index + 1}`}
                         eager={index === 0}
+                        instant={index === 0}
                         src={image}
                       />
                     </figure>
@@ -539,6 +596,7 @@ export default function About() {
                   <ProgressiveImage
                     alt="Mapa de ubicación de Moon Studio"
                     eager
+                    instant
                     src="/images/espacio/map.jpg"
                   />
                 </a>

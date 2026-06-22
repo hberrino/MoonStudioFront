@@ -5,9 +5,6 @@ const MIN_VISIBLE_MS = 520;
 const MAX_VISIBLE_MS = 1600;
 const CRITICAL_IMAGES = [
   "/images/logo/moon-studio-hero.jpg",
-  "/images/servicios/servicio_peluqueria.jpg",
-  "/images/profesionales/trabajos/Ely/perfil.jpg",
-  "/images/profesionales/trabajos/Ely/trabajos1.jpg",
 ];
 
 function preloadImage(src) {

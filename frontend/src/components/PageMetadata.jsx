@@ -5,7 +5,7 @@ const SITE_URL = "https://moonstudio.com.ar";
 
 const pages = {
   "/": {
-    title: "Moon Studio | Peluquería, uñas, cejas y pestañas",
+    title: "Moon Studio | Belleza, uñas, pestañas y peluquería en Tandil",
     description:
       "Conocé Moon Studio, sus servicios de peluquería, uñas, cejas y pestañas, y reservá tu turno online.",
     robots: "index, follow",
