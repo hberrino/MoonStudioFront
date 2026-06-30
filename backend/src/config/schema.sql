@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS turnos (
   id_servicio INT NOT NULL,
   fecha DATE NOT NULL,
   hora TIME NOT NULL,
+  hora_fin TIME NULL,
   estado ENUM('pendiente', 'confirmado', 'cancelado') NOT NULL DEFAULT 'pendiente',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_turnos_profesional

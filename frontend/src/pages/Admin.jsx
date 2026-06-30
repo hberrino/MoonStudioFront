@@ -21,6 +21,7 @@ const emptyManualTurnForm = {
   nombreCliente: "",
   fecha: "",
   hora: "",
+  horaFin: "",
   idServicio: "",
   idProfesional: "",
 };
@@ -698,7 +699,10 @@ export default function Admin() {
                         <span>{formatWeekday(turno.fecha)}</span>
                         <strong>{formatDate(turno.fecha)}</strong>
                       </div>
-                      <p className="admin-turno-hour">{String(turno.hora).slice(0, 5)} hs</p>
+                      <p className="admin-turno-hour">
+                        {String(turno.hora).slice(0, 5)}
+                        {turno.hora_fin ? ` a ${String(turno.hora_fin).slice(0, 5)}` : ""} hs
+                      </p>
                       <p className="mt-2 text-base font-medium text-primary">
                         {turno.nombre_cliente}
                       </p>
@@ -1046,7 +1050,7 @@ export default function Admin() {
                 />
               </label>
               <label className="block">
-                <span className="form-label">Hora</span>
+                <span className="form-label">Desde</span>
                 <input
                   className="form-input form-input-boxed"
                   onChange={(event) =>
@@ -1055,6 +1059,19 @@ export default function Admin() {
                   required
                   type="time"
                   value={manualTurnForm.hora}
+                />
+              </label>
+              <label className="block">
+                <span className="form-label">Hasta</span>
+                <input
+                  className="form-input form-input-boxed"
+                  min={manualTurnForm.hora || undefined}
+                  onChange={(event) =>
+                    setManualTurnForm({ ...manualTurnForm, horaFin: event.target.value })
+                  }
+                  required
+                  type="time"
+                  value={manualTurnForm.horaFin}
                 />
               </label>
               <button className="button-primary md:col-span-2" type="submit">

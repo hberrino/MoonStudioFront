@@ -108,13 +108,23 @@ export async function getHorariosDisponibles(req, res, next) {
     const ocupados = await findTurnosOcupados(req.params.idProfesional, fecha);
     const bloqueos = await findBloqueosByProfesionalAndDate(req.params.idProfesional, fecha);
     const disponibles = horarios.filter(
-      (horario) => !ocupados.includes(horario) && !isHorarioBlocked(horario, bloqueos),
+      (horario) => !isHorarioOccupied(horario, ocupados) && !isHorarioBlocked(horario, bloqueos),
     );
 
     return res.json(disponibles);
   } catch (error) {
     return next(error);
   }
+}
+
+function isHorarioOccupied(horario, ocupados) {
+  const horarioMinutes = timeToMinutes(horario);
+
+  return ocupados.some((turno) => {
+    const inicio = timeToMinutes(turno.hora);
+    if (!turno.horaFin) return horarioMinutes === inicio;
+    return horarioMinutes >= inicio && horarioMinutes < timeToMinutes(turno.horaFin);
+  });
 }
 
 function buildHorarios({ hora_inicio: horaInicio, hora_fin: horaFin, intervalo_minutos: intervalo }) {

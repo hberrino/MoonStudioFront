@@ -17,6 +17,7 @@ const turnoSelect = `
     s.precio_min AS servicio_precio,
     t.fecha,
     t.hora,
+    t.hora_fin,
     t.estado,
     t.created_at
   FROM turnos t
@@ -42,15 +43,31 @@ export async function createTurno({
   idServicio,
   fecha,
   hora,
+  horaFin = null,
 }) {
   const [result] = await pool.query(
     `INSERT INTO turnos
-      (nombre_cliente, email_cliente, telefono_cliente, id_profesional, id_servicio, fecha, hora)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [nombreCliente, emailCliente, telefonoCliente, idProfesional, idServicio, fecha, hora],
+      (nombre_cliente, email_cliente, telefono_cliente, id_profesional, id_servicio, fecha, hora, hora_fin)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [nombreCliente, emailCliente, telefonoCliente, idProfesional, idServicio, fecha, hora, horaFin],
   );
 
   return findTurnoById(result.insertId);
+}
+
+export async function hasTurnoOverlap(idProfesional, fecha, horaInicio, horaFin) {
+  const [rows] = await pool.query(
+    `SELECT id
+     FROM turnos
+     WHERE id_profesional = ?
+       AND fecha = ?
+       AND estado <> 'cancelado'
+       AND hora < ?
+       AND COALESCE(hora_fin, ADDTIME(hora, '00:01:00')) > ?
+     LIMIT 1`,
+    [idProfesional, fecha, horaFin, horaInicio],
+  );
+  return rows.length > 0;
 }
 
 export async function updateTurnoEstado(id, estado) {

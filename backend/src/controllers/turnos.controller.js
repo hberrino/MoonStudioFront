@@ -4,6 +4,7 @@ import {
   deleteTurnosByProfesional,
   findAllTurnos,
   findTurnoById,
+  hasTurnoOverlap,
   updateTurnoEstado,
 } from "../models/turno.model.js";
 import { findProfesionalById, hasServicioAsignado } from "../models/profesional.model.js";
@@ -140,7 +141,7 @@ export async function postTurno(req, res, next) {
 
 export async function postTurnoManual(req, res, next) {
   try {
-    const { nombreCliente, idProfesional, idServicio, fecha, hora } = req.body;
+    const { nombreCliente, idProfesional, idServicio, fecha, hora, horaFin } = req.body;
     const normalizedTurno = {
       nombreCliente: sanitizeText(nombreCliente),
       emailCliente: "",
@@ -149,6 +150,7 @@ export async function postTurnoManual(req, res, next) {
       idServicio: Number(idServicio),
       fecha: sanitizeText(fecha),
       hora: sanitizeText(hora).slice(0, 5),
+      horaFin: sanitizeText(horaFin).slice(0, 5),
     };
 
     if (!isValidClientName(normalizedTurno.nombreCliente)) {
@@ -161,7 +163,9 @@ export async function postTurnoManual(req, res, next) {
       !isValidPositiveInteger(normalizedTurno.idProfesional) ||
       !isValidPositiveInteger(normalizedTurno.idServicio) ||
       !isValidDate(normalizedTurno.fecha) ||
-      !isValidTime(normalizedTurno.hora)
+      !isValidTime(normalizedTurno.hora) ||
+      !isValidTime(normalizedTurno.horaFin) ||
+      normalizedTurno.horaFin <= normalizedTurno.hora
     ) {
       return res.status(400).json({ message: "Los datos del turno no son validos." });
     }
@@ -174,6 +178,19 @@ export async function postTurnoManual(req, res, next) {
     if (!servicioAsignado) {
       return res.status(400).json({
         message: "El servicio no esta asignado a la profesional seleccionada.",
+      });
+    }
+
+    const turnoSuperpuesto = await hasTurnoOverlap(
+      normalizedTurno.idProfesional,
+      normalizedTurno.fecha,
+      normalizedTurno.hora,
+      normalizedTurno.horaFin,
+    );
+
+    if (turnoSuperpuesto) {
+      return res.status(409).json({
+        message: "Ese rango se superpone con otro turno de la profesional.",
       });
     }
 

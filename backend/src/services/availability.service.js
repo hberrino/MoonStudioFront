@@ -17,8 +17,18 @@ export async function getAvailableTimes(idProfesional, fecha) {
   ]);
 
   return horarios.filter(
-    (horario) => !ocupados.includes(horario) && !isHorarioBlocked(horario, bloqueos),
+    (horario) => !isHorarioOccupied(horario, ocupados) && !isHorarioBlocked(horario, bloqueos),
   );
+}
+
+function isHorarioOccupied(horario, ocupados) {
+  const horarioMinutes = timeToMinutes(horario);
+
+  return ocupados.some((turno) => {
+    const inicio = timeToMinutes(turno.hora);
+    if (!turno.horaFin) return horarioMinutes === inicio;
+    return horarioMinutes >= inicio && horarioMinutes < timeToMinutes(turno.horaFin);
+  });
 }
 
 function buildHorarios({ hora_inicio: horaInicio, hora_fin: horaFin, intervalo_minutos: intervalo }) {

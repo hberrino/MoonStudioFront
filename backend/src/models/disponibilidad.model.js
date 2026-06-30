@@ -58,10 +58,13 @@ export async function findDisponibilidadForDate(idProfesional, diaSemana) {
 
 export async function findTurnosOcupados(idProfesional, fecha) {
   const [rows] = await pool.query(
-    `SELECT hora
+    `SELECT hora, hora_fin
      FROM turnos
      WHERE id_profesional = ? AND fecha = ? AND estado <> 'cancelado'`,
     [idProfesional, fecha],
   );
-  return rows.map((row) => String(row.hora).slice(0, 5));
+  return rows.map((row) => ({
+    hora: String(row.hora).slice(0, 5),
+    horaFin: row.hora_fin ? String(row.hora_fin).slice(0, 5) : null,
+  }));
 }
