@@ -990,8 +990,11 @@ export default function Admin() {
             <p className="mt-2 text-on-surface-variant">
               Registra turnos tomados por fuera de la web. No hace falta cargar correo ni telefono.
             </p>
-            <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={handleCreateManualTurn}>
-              <label className="block md:col-span-2">
+            <form
+              className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-12"
+              onSubmit={handleCreateManualTurn}
+            >
+              <label className="block lg:col-span-4">
                 <span className="form-label">Nombre</span>
                 <input
                   className="form-input form-input-boxed"
@@ -1002,7 +1005,7 @@ export default function Admin() {
                   value={manualTurnForm.nombreCliente}
                 />
               </label>
-              <label className="block">
+              <label className="block lg:col-span-4">
                 <span className="form-label">Profesional</span>
                 <select
                   className="form-input form-input-boxed"
@@ -1018,7 +1021,7 @@ export default function Admin() {
                   ))}
                 </select>
               </label>
-              <label className="block">
+              <label className="block md:col-span-2 lg:col-span-4">
                 <span className="form-label">Servicio</span>
                 <select
                   className="form-input form-input-boxed"
@@ -1037,7 +1040,7 @@ export default function Admin() {
                   ))}
                 </select>
               </label>
-              <label className="block">
+              <label className="block lg:col-span-4">
                 <span className="form-label">Fecha</span>
                 <input
                   className="form-input form-input-boxed"
@@ -1049,7 +1052,7 @@ export default function Admin() {
                   value={manualTurnForm.fecha}
                 />
               </label>
-              <label className="block">
+              <label className="block lg:col-span-4">
                 <span className="form-label">Desde</span>
                 <input
                   className="form-input form-input-boxed"
@@ -1061,7 +1064,7 @@ export default function Admin() {
                   value={manualTurnForm.hora}
                 />
               </label>
-              <label className="block">
+              <label className="block lg:col-span-4">
                 <span className="form-label">Hasta</span>
                 <input
                   className="form-input form-input-boxed"
@@ -1074,7 +1077,7 @@ export default function Admin() {
                   value={manualTurnForm.horaFin}
                 />
               </label>
-              <button className="button-primary md:col-span-2" type="submit">
+              <button className="button-primary md:col-span-2 lg:col-span-12" type="submit">
                 Agendar turno
               </button>
             </form>
