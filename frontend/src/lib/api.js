@@ -99,6 +99,11 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  createTurnoManual: (payload) =>
+    apiFetch("/turnos/manual", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
   getTurnos: () => apiFetch("/turnos"),
   updateTurnoEstado: (id, estado) =>
     apiFetch(`/turnos/${id}/estado`, {

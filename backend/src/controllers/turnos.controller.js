@@ -138,6 +138,69 @@ export async function postTurno(req, res, next) {
   }
 }
 
+export async function postTurnoManual(req, res, next) {
+  try {
+    const { nombreCliente, idProfesional, idServicio, fecha, hora } = req.body;
+    const normalizedTurno = {
+      nombreCliente: sanitizeText(nombreCliente),
+      emailCliente: "",
+      telefonoCliente: "",
+      idProfesional: Number(idProfesional),
+      idServicio: Number(idServicio),
+      fecha: sanitizeText(fecha),
+      hora: sanitizeText(hora).slice(0, 5),
+    };
+
+    if (!isValidClientName(normalizedTurno.nombreCliente)) {
+      return res.status(400).json({
+        message: "Ingresa un nombre valido, sin numeros ni caracteres especiales.",
+      });
+    }
+
+    if (
+      !isValidPositiveInteger(normalizedTurno.idProfesional) ||
+      !isValidPositiveInteger(normalizedTurno.idServicio) ||
+      !isValidDate(normalizedTurno.fecha) ||
+      !isValidTime(normalizedTurno.hora)
+    ) {
+      return res.status(400).json({ message: "Los datos del turno no son validos." });
+    }
+
+    const servicioAsignado = await hasServicioAsignado(
+      normalizedTurno.idProfesional,
+      normalizedTurno.idServicio,
+    );
+
+    if (!servicioAsignado) {
+      return res.status(400).json({
+        message: "El servicio no esta asignado a la profesional seleccionada.",
+      });
+    }
+
+    const horariosDisponibles = await getAvailableTimes(
+      normalizedTurno.idProfesional,
+      normalizedTurno.fecha,
+    );
+
+    if (!horariosDisponibles.includes(normalizedTurno.hora)) {
+      return res.status(409).json({
+        message: "El horario no esta disponible o se encuentra bloqueado.",
+      });
+    }
+
+    const turno = await createTurno(normalizedTurno);
+    return res.status(201).json(turno);
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        message: "La profesional ya tiene un turno reservado en ese horario.",
+      });
+    }
+
+    return next(error);
+  }
+}
+
 export async function patchTurnoEstado(req, res, next) {
   try {
     const { estado } = req.body;

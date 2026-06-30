@@ -17,6 +17,13 @@ const emptyBlockForm = {
   horaFin: "20:00",
   motivo: "",
 };
+const emptyManualTurnForm = {
+  nombreCliente: "",
+  fecha: "",
+  hora: "",
+  idServicio: "",
+  idProfesional: "",
+};
 const diasSemana = [
   { value: 0, label: "Domingo" },
   { value: 1, label: "Lunes" },
@@ -61,6 +68,8 @@ export default function Admin() {
   const [professionalForm, setProfessionalForm] = useState(emptyProfessionalForm);
   const [profileForm, setProfileForm] = useState(emptyProfileForm);
   const [blockForm, setBlockForm] = useState(emptyBlockForm);
+  const [manualTurnForm, setManualTurnForm] = useState(emptyManualTurnForm);
+  const [manualTurnServices, setManualTurnServices] = useState([]);
   const [serviceSectionFilter, setServiceSectionFilter] = useState("");
   const [turnosProfessionalFilter, setTurnosProfessionalFilter] = useState("");
   const [turnosTimeFilter, setTurnosTimeFilter] = useState("upcoming");
@@ -481,6 +490,39 @@ export default function Admin() {
     }
   }
 
+  async function handleManualProfessionalChange(idProfesional) {
+    setManualTurnForm((currentForm) => ({
+      ...currentForm,
+      idProfesional,
+      idServicio: "",
+    }));
+    setManualTurnServices([]);
+
+    if (!idProfesional) return;
+
+    try {
+      setError("");
+      setManualTurnServices(await api.getProfesionalServicios(idProfesional));
+    } catch (requestError) {
+      handleAdminRequestError(requestError);
+    }
+  }
+
+  async function handleCreateManualTurn(event) {
+    event.preventDefault();
+
+    try {
+      setError("");
+      const turno = await api.createTurnoManual(manualTurnForm);
+      setTurnos((currentTurnos) => [turno, ...currentTurnos]);
+      setManualTurnForm(emptyManualTurnForm);
+      setManualTurnServices([]);
+      setMessage("Turno agendado. El horario ya quedo ocupado en la agenda.");
+    } catch (requestError) {
+      handleAdminRequestError(requestError);
+    }
+  }
+
   if (!isLoggedIn) {
     return (
       <main className="admin-page min-h-screen px-5 py-10">
@@ -552,6 +594,7 @@ export default function Admin() {
             <option value="servicios">Servicios y precios</option>
             <option value="disponibilidad">Disponibilidad</option>
             <option value="perfil">Mi perfil</option>
+            <option value="agendar">Agendar turno</option>
             <option value="actualizar">Actualizar datos</option>
           </select>
         </label>
@@ -584,6 +627,13 @@ export default function Admin() {
             type="button"
           >
             Mi perfil
+          </button>
+          <button
+            className={`admin-tab ${activeTab === "agendar" ? "admin-tab-active" : ""}`}
+            onClick={() => setActiveTab("agendar")}
+            type="button"
+          >
+            Agendar turno
           </button>
           <button className="admin-tab" onClick={refreshAdminData} type="button">
             Actualizar
@@ -929,6 +979,88 @@ export default function Admin() {
                 ))}
               </div>
             </div>
+          </section>
+        ) : activeTab === "agendar" ? (
+          <section className="admin-panel mt-8">
+            <h2 className="admin-panel-title">Agendar turno manual</h2>
+            <p className="mt-2 text-on-surface-variant">
+              Registra turnos tomados por fuera de la web. No hace falta cargar correo ni telefono.
+            </p>
+            <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={handleCreateManualTurn}>
+              <label className="block md:col-span-2">
+                <span className="form-label">Nombre</span>
+                <input
+                  className="form-input form-input-boxed"
+                  onChange={(event) =>
+                    setManualTurnForm({ ...manualTurnForm, nombreCliente: event.target.value })
+                  }
+                  required
+                  value={manualTurnForm.nombreCliente}
+                />
+              </label>
+              <label className="block">
+                <span className="form-label">Profesional</span>
+                <select
+                  className="form-input form-input-boxed"
+                  onChange={(event) => handleManualProfessionalChange(event.target.value)}
+                  required
+                  value={manualTurnForm.idProfesional}
+                >
+                  <option value="">Seleccionar profesional</option>
+                  {profesionales.map((professional) => (
+                    <option key={professional.id} value={professional.id}>
+                      {professional.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="form-label">Servicio</span>
+                <select
+                  className="form-input form-input-boxed"
+                  disabled={!manualTurnForm.idProfesional}
+                  onChange={(event) =>
+                    setManualTurnForm({ ...manualTurnForm, idServicio: event.target.value })
+                  }
+                  required
+                  value={manualTurnForm.idServicio}
+                >
+                  <option value="">Seleccionar servicio</option>
+                  {manualTurnServices.map((service) => (
+                    <option key={service.id} value={service.id}>
+                      {service.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="form-label">Fecha</span>
+                <input
+                  className="form-input form-input-boxed"
+                  onChange={(event) =>
+                    setManualTurnForm({ ...manualTurnForm, fecha: event.target.value })
+                  }
+                  required
+                  type="date"
+                  value={manualTurnForm.fecha}
+                />
+              </label>
+              <label className="block">
+                <span className="form-label">Hora</span>
+                <input
+                  className="form-input form-input-boxed"
+                  onChange={(event) =>
+                    setManualTurnForm({ ...manualTurnForm, hora: event.target.value })
+                  }
+                  required
+                  type="time"
+                  value={manualTurnForm.hora}
+                />
+              </label>
+              <button className="button-primary md:col-span-2" type="submit">
+                Agendar turno
+              </button>
+            </form>
           </section>
         ) : activeTab === "perfil" ? (
           <section className="admin-panel mt-8">
