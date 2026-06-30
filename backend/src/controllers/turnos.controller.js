@@ -177,17 +177,6 @@ export async function postTurnoManual(req, res, next) {
       });
     }
 
-    const horariosDisponibles = await getAvailableTimes(
-      normalizedTurno.idProfesional,
-      normalizedTurno.fecha,
-    );
-
-    if (!horariosDisponibles.includes(normalizedTurno.hora)) {
-      return res.status(409).json({
-        message: "El horario no esta disponible o se encuentra bloqueado.",
-      });
-    }
-
     const turno = await createTurno(normalizedTurno);
     return res.status(201).json(turno);
   } catch (error) {
