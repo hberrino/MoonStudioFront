@@ -2187,6 +2187,17 @@ summary:focus-visible {
   overflow-wrap: anywhere;
 }
 
+.admin-turno-actions {
+  align-content: end;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.admin-turno-actions .admin-danger-button {
+  min-height: 2.55rem;
+  padding: 0.72rem 0.9rem;
+}
+
 .admin-price-row {
   align-items: center;
   background: #fbf9f4;

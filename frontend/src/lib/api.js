@@ -105,6 +105,10 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify({ estado }),
     }),
+  deleteTurno: (id) =>
+    apiFetch(`/turnos/${id}`, {
+      method: "DELETE",
+    }),
   deleteTurnosByProfesional: (id) =>
     apiFetch(`/turnos/profesional/${id}`, {
       method: "DELETE",

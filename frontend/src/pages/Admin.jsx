@@ -191,6 +191,25 @@ export default function Admin() {
     }
   }
 
+  async function handleDeleteTurno(turno) {
+    const confirmed = window.confirm(
+      `Liberar el turno de ${turno.nombre_cliente} del ${formatDate(turno.fecha)} a las ${String(turno.hora).slice(0, 5)}? Esta accion eliminara el turno definitivamente.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setError("");
+      await api.deleteTurno(turno.id);
+      setTurnos((currentTurnos) =>
+        currentTurnos.filter((currentTurno) => currentTurno.id !== turno.id),
+      );
+      setMessage("Turno liberado. El horario vuelve a estar disponible.");
+    } catch (requestError) {
+      handleAdminRequestError(requestError);
+    }
+  }
+
   async function handlePriceSubmit(event, service) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -640,18 +659,27 @@ export default function Admin() {
                       <span>{turno.telefono_cliente}</span>
                       <span>{turno.email_cliente}</span>
                     </div>
-                    <label className="block">
-                      <span className="form-label">Estado</span>
-                      <select
-                        className="form-input form-input-boxed"
-                        onChange={(event) => handleEstadoChange(turno.id, event.target.value)}
-                        value={turno.estado}
+                    <div className="admin-turno-actions">
+                      <label className="block">
+                        <span className="form-label">Estado</span>
+                        <select
+                          className="form-input form-input-boxed"
+                          onChange={(event) => handleEstadoChange(turno.id, event.target.value)}
+                          value={turno.estado}
+                        >
+                          <option value="pendiente">Pendiente</option>
+                          <option value="confirmado">Confirmado</option>
+                          <option value="cancelado">Cancelado</option>
+                        </select>
+                      </label>
+                      <button
+                        className="admin-danger-button admin-compact-button"
+                        onClick={() => handleDeleteTurno(turno)}
+                        type="button"
                       >
-                        <option value="pendiente">Pendiente</option>
-                        <option value="confirmado">Confirmado</option>
-                        <option value="cancelado">Cancelado</option>
-                      </select>
-                    </label>
+                        Liberar turno
+                      </button>
+                    </div>
                   </article>
                 ))
               ) : (
