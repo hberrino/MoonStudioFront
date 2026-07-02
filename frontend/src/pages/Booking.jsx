@@ -42,6 +42,7 @@ export default function Booking() {
   const [isLoadingHorarios, setIsLoadingHorarios] = useState(false);
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingConfirmation, setBookingConfirmation] = useState(null);
   const dateOptions = useMemo(() => buildDateOptions(30), []);
   const selectedServiceData = useMemo(
     () => servicios.find((service) => String(service.id) === selectedServicio) || null,
@@ -110,6 +111,23 @@ export default function Booking() {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!bookingConfirmation) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setBookingConfirmation(null);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [bookingConfirmation]);
 
   const profesionalesDisponibles = useMemo(() => {
     if (!selectedServicio) return profesionales;
@@ -238,7 +256,7 @@ export default function Booking() {
     setStatus({ type: "", message: "" });
 
     try {
-      await api.createTurno({
+      const createdTurno = await api.createTurno({
         nombreCliente: normalizeName(formValues.name),
         emailCliente: normalizeEmail(formValues.email),
         telefonoCliente: normalizePhone(formValues.phone),
@@ -248,6 +266,12 @@ export default function Booking() {
         hora: formValues.time,
       });
 
+      setBookingConfirmation({
+        fecha: selectedDate,
+        hora: String(createdTurno.hora || formValues.time).slice(0, 5),
+        profesional: createdTurno.profesional_nombre,
+        servicio: createdTurno.servicio_nombre,
+      });
       setFormValues(initialFormValues);
       setFormErrors({});
       setSelectedServiceSection("");
@@ -257,11 +281,7 @@ export default function Booking() {
       setSelectedDate("");
       setHorariosDisponibles([]);
       setCurrentStep(1);
-      setStatus({
-        type: "success",
-        message:
-          "Turno agendado exitosamente. De requerir una atención especial o personalizada, podrás compartir los detalles con la profesional cuando se comunique.",
-      });
+      setStatus({ type: "", message: "" });
     } catch (error) {
       setStatus({
         type: "error",
@@ -531,11 +551,7 @@ export default function Booking() {
             </FormGroup>
           ) : null}
 
-          {status.message ? (
-            <p className={status.type === "error" ? "form-error" : "form-success"}>
-              {status.message}
-            </p>
-          ) : null}
+          {status.message ? <p className="form-error">{status.message}</p> : null}
 
           <div className="booking-actions">
             {currentStep > 1 ? (
@@ -568,6 +584,53 @@ export default function Booking() {
           Contactar al estudio
         </a>
       </aside>
+
+      {bookingConfirmation ? (
+        <div
+          aria-labelledby="booking-confirmation-title"
+          aria-modal="true"
+          className="profile-modal-backdrop booking-confirmation-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setBookingConfirmation(null);
+          }}
+          role="dialog"
+        >
+          <div className="booking-confirmation-modal">
+            <p className="text-label uppercase text-tertiary">Reserva confirmada</p>
+            <h2 id="booking-confirmation-title">Turno agendado con éxito</h2>
+            <div className="booking-confirmation-details">
+              <div>
+                <span>Profesional</span>
+                <strong>{bookingConfirmation.profesional}</strong>
+              </div>
+              <div>
+                <span>Servicio</span>
+                <strong>{bookingConfirmation.servicio}</strong>
+              </div>
+              <div>
+                <span>Fecha</span>
+                <strong>{formatBookingDate(bookingConfirmation.fecha)}</strong>
+              </div>
+              <div>
+                <span>Horario</span>
+                <strong>{bookingConfirmation.hora} hs</strong>
+              </div>
+            </div>
+            <p className="booking-confirmation-note">
+              Tu turno ya quedó registrado. De requerir una atención especial o personalizada,
+              podrás compartir los detalles con la profesional cuando se comunique.
+            </p>
+            <button
+              autoFocus
+              className="button-primary booking-confirmation-button"
+              onClick={() => setBookingConfirmation(null)}
+              type="button"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -706,6 +769,18 @@ function formatServicePrice(service) {
 function formatCurrency(value) {
   if (value === null || value === undefined || value === "") return "";
   return `$${Number(value).toLocaleString("es-AR")}`;
+}
+
+function formatBookingDate(value) {
+  const [year, month, day] = String(value).split("-");
+  const date = new Date(Number(year), Number(month) - 1, Number(day), 12);
+
+  return new Intl.DateTimeFormat("es-AR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(date);
 }
 
 function buildDateOptions(totalDays) {
