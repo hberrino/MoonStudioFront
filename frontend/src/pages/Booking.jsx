@@ -58,6 +58,13 @@ export default function Booking() {
       (service) => (service.seccion || "peluqueria") === selectedServiceSection,
     );
   }, [selectedServiceSection, servicios]);
+  const availableServiceSections = useMemo(
+    () =>
+      serviceSections.filter((section) =>
+        servicios.some((service) => (service.seccion || "peluqueria") === section.value),
+      ),
+    [servicios],
+  );
   const profesionalesPorServicio = useMemo(() => {
     const serviceMap = {};
 
@@ -394,7 +401,7 @@ export default function Booking() {
               <div className="booking-choice-mobile">
                 <ChoiceHeading number="1" title="Elegí un sector" subtitle="¿Qué tipo de servicio buscás?" />
                 <div className="booking-sector-grid">
-                  {serviceSections.map((section) => (
+                  {availableServiceSections.map((section) => (
                     <button
                       aria-pressed={selectedServiceSection === section.value}
                       className={`booking-choice-card booking-sector-card ${selectedServiceSection === section.value ? "is-selected" : ""}`}
@@ -417,25 +424,33 @@ export default function Booking() {
                 {selectedServiceSection ? (
                   <>
                     <ChoiceHeading number="2" title="Elegí un servicio" subtitle="Seleccioná la opción que preferís." />
-                    <div className="booking-service-card-list">
-                      {filteredServicios.map((service) => (
-                        <button
-                          aria-pressed={selectedServicio === String(service.id)}
-                          className={`booking-choice-card booking-service-card ${selectedServicio === String(service.id) ? "is-selected" : ""}`}
-                          key={service.id}
-                          onClick={() => {
-                            setSelectedServicio(String(service.id));
-                            setSelectedProfesional("");
-                            setSelectedDate("");
-                            updateField("time", "");
-                          }}
-                          type="button"
-                        >
-                          <span><strong>{service.nombre}</strong><small>{formatProfessionalAssignment(profesionalesPorServicio[String(service.id)])}</small></span>
-                          <b>{formatServicePrice(service)}</b>
-                        </button>
-                      ))}
-                    </div>
+                    <label className="booking-mobile-service-select">
+                      <span className="form-label">Servicio</span>
+                      <select
+                        className="form-input form-input-boxed booking-service-select"
+                        onChange={(event) => {
+                          setSelectedServicio(event.target.value);
+                          setSelectedProfesional("");
+                          setSelectedDate("");
+                          updateField("time", "");
+                        }}
+                        required
+                        value={selectedServicio}
+                      >
+                        <option value="">Tocá para elegir un servicio</option>
+                        {filteredServicios.map((service) => (
+                          <option key={service.id} value={service.id}>
+                            {formatServiceOption(service, profesionalesPorServicio[String(service.id)])}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedServiceData ? (
+                        <div className="booking-mobile-service-selected">
+                          <span>{selectedServiceData.nombre}</span>
+                          <strong>{formatServicePrice(selectedServiceData)}</strong>
+                        </div>
+                      ) : null}
+                    </label>
                   </>
                 ) : null}
 
@@ -491,7 +506,7 @@ export default function Booking() {
                     value={selectedServiceSection}
                   >
                     <option value="">Selecciona un sector</option>
-                    {serviceSections.map((section) => (
+                    {availableServiceSections.map((section) => (
                       <option key={section.value} value={section.value}>
                         {section.label}
                       </option>
@@ -598,21 +613,23 @@ export default function Booking() {
               </FormGroup>
               </div>
 
-              <label className="booking-contact-consent">
-                <input
-                  checked={acceptsProfessionalContact}
-                  onChange={(event) => {
-                    setAcceptsProfessionalContact(event.target.checked);
-                    setStatus({ type: "", message: "" });
-                  }}
-                  required
-                  type="checkbox"
-                />
-                <span>
-                  Acepto que, si fuera necesario, la profesional se comunique conmigo para
-                  personalizar mi experiencia.
-                </span>
-              </label>
+              {selectedProfesional ? (
+                <label className="booking-contact-consent">
+                  <input
+                    checked={acceptsProfessionalContact}
+                    onChange={(event) => {
+                      setAcceptsProfessionalContact(event.target.checked);
+                      setStatus({ type: "", message: "" });
+                    }}
+                    required
+                    type="checkbox"
+                  />
+                  <span>
+                    Acepto que la profesional se comunique conmigo para coordinar detalles del
+                    turno.
+                  </span>
+                </label>
+              ) : null}
             </>
           ) : null}
 
@@ -933,11 +950,6 @@ function ChoiceHeading({ number, title, subtitle }) {
 function formatProfessionalList(professionalNames = []) {
   if (professionalNames.length <= 2) return professionalNames.join(" y ");
   return `${professionalNames.slice(0, -1).join(", ")} y ${professionalNames.at(-1)}`;
-}
-
-function formatProfessionalAssignment(professionalNames = []) {
-  if (professionalNames.length === 0) return "Profesional a confirmar";
-  return formatProfessionalList(professionalNames);
 }
 
 function getSectionInitial(label) {

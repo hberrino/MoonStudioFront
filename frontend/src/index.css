@@ -1752,6 +1752,7 @@ summary:focus-visible {
   display: flex;
   gap: 0.8rem;
   line-height: 1.55;
+  margin-top: 1.25rem;
   padding: 1rem;
 }
 
@@ -1930,6 +1931,41 @@ summary:focus-visible {
 .booking-service-card-list {
   display: grid;
   gap: 0.6rem;
+}
+
+.booking-mobile-service-select {
+  background: #f5f3ee;
+  border: 1px solid rgba(103, 90, 72, 0.3);
+  border-radius: 0.65rem;
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.9rem;
+}
+
+.booking-mobile-service-select .booking-service-select {
+  background-color: #fbf9f4;
+  border-color: rgba(103, 90, 72, 0.5);
+  font-weight: 500;
+}
+
+.booking-mobile-service-selected {
+  align-items: center;
+  border-top: 1px solid rgba(103, 90, 72, 0.18);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding-top: 0.7rem;
+}
+
+.booking-mobile-service-selected span {
+  color: #4f4436;
+  font-size: 0.8rem;
+}
+
+.booking-mobile-service-selected strong {
+  color: #5b4f3f;
+  flex: 0 0 auto;
+  font-size: 0.75rem;
 }
 
 .booking-service-card {
