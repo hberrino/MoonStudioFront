@@ -7,6 +7,7 @@ const initialFormValues = {
   phone: "",
   time: "",
 };
+const BOOKING_WINDOW_DAYS = 60;
 
 const NAME_REGEX = /^[A-Za-zÀ-ÿÑñ\s]{2,80}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -390,6 +391,89 @@ export default function Booking() {
 
           {currentStep === 2 ? (
             <>
+              <div className="booking-choice-mobile">
+                <ChoiceHeading number="1" title="Elegí un sector" subtitle="¿Qué tipo de servicio buscás?" />
+                <div className="booking-sector-grid">
+                  {serviceSections.map((section) => (
+                    <button
+                      aria-pressed={selectedServiceSection === section.value}
+                      className={`booking-choice-card booking-sector-card ${selectedServiceSection === section.value ? "is-selected" : ""}`}
+                      key={section.value}
+                      onClick={() => {
+                        setSelectedServiceSection(section.value);
+                        setSelectedServicio("");
+                        setSelectedProfesional("");
+                        setSelectedDate("");
+                        updateField("time", "");
+                      }}
+                      type="button"
+                    >
+                      <span>{getSectionInitial(section.label)}</span>
+                      <strong>{section.label}</strong>
+                    </button>
+                  ))}
+                </div>
+
+                {selectedServiceSection ? (
+                  <>
+                    <ChoiceHeading number="2" title="Elegí un servicio" subtitle="Seleccioná la opción que preferís." />
+                    <div className="booking-service-card-list">
+                      {filteredServicios.map((service) => (
+                        <button
+                          aria-pressed={selectedServicio === String(service.id)}
+                          className={`booking-choice-card booking-service-card ${selectedServicio === String(service.id) ? "is-selected" : ""}`}
+                          key={service.id}
+                          onClick={() => {
+                            setSelectedServicio(String(service.id));
+                            setSelectedProfesional("");
+                            setSelectedDate("");
+                            updateField("time", "");
+                          }}
+                          type="button"
+                        >
+                          <span><strong>{service.nombre}</strong><small>{formatProfessionalAssignment(profesionalesPorServicio[String(service.id)])}</small></span>
+                          <b>{formatServicePrice(service)}</b>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : null}
+
+                {selectedServicio ? (
+                  <>
+                    <ChoiceHeading number="3" title="Elegí una profesional" subtitle="Disponibles para este servicio." />
+                    <div className="booking-professional-grid">
+                      {profesionalesDisponibles.map((professional) => (
+                        <button
+                          aria-pressed={selectedProfesional === String(professional.id)}
+                          className={`booking-choice-card booking-professional-card ${selectedProfesional === String(professional.id) ? "is-selected" : ""}`}
+                          key={professional.id}
+                          onClick={() => {
+                            setSelectedProfesional(String(professional.id));
+                            setSelectedDate("");
+                            setCalendarMonth(startOfMonth(new Date()));
+                            setCalendarAvailability({});
+                            updateField("time", "");
+                          }}
+                          type="button"
+                        >
+                          <span>{getProfessionalInitials(professional.nombre)}</span>
+                          <strong>{professional.nombre}</strong>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : null}
+
+                {selectedServiceData && selectedProfesional ? (
+                  <div className="booking-choice-summary">
+                    <small>Tu selección</small>
+                    <strong>{selectedServiceData.nombre} · {profesionales.find((item) => String(item.id) === selectedProfesional)?.nombre}</strong>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="booking-choice-legacy">
               <FormGroup title="Servicio">
                 <label className="booking-select-shell">
                   <span className="form-label">Sector</span>
@@ -512,6 +596,7 @@ export default function Booking() {
                   </select>
                 </label>
               </FormGroup>
+              </div>
 
               <label className="booking-contact-consent">
                 <input
@@ -533,7 +618,7 @@ export default function Booking() {
 
           {currentStep === 3 ? (
             <FormGroup title="Fecha y hora">
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="booking-date-time-layout">
                 <div className="booking-calendar" aria-label="Calendario de turnos">
                   <div className="booking-calendar-header">
                     <button
@@ -593,7 +678,11 @@ export default function Booking() {
                     <span><i className="is-unavailable" /> Sin horarios</span>
                   </div>
                 </div>
-                <label className="block">
+                <label className="booking-time-panel">
+                  <span className="text-label uppercase text-tertiary">Horario</span>
+                  <strong>
+                    {selectedDate ? formatBookingDate(selectedDate) : "Elegí un día disponible"}
+                  </strong>
                   <span className="form-label">Horario preferido</span>
                   <select
                     className="form-input form-input-boxed"
@@ -617,6 +706,9 @@ export default function Booking() {
                       </option>
                     ))}
                   </select>
+                  <small>
+                    Los horarios mostrados corresponden a la profesional seleccionada.
+                  </small>
                 </label>
               </div>
               {selectedDate && !isLoadingHorarios && visibleHorarios.length === 0 ? (
@@ -826,9 +918,39 @@ function formatServiceOption(service, professionalNames = []) {
   return `${serviceLabel}${professionalsLabel}`;
 }
 
+function ChoiceHeading({ number, title, subtitle }) {
+  return (
+    <div className="booking-choice-heading">
+      <span>{number}</span>
+      <div>
+        <strong>{title}</strong>
+        <small>{subtitle}</small>
+      </div>
+    </div>
+  );
+}
+
 function formatProfessionalList(professionalNames = []) {
   if (professionalNames.length <= 2) return professionalNames.join(" y ");
   return `${professionalNames.slice(0, -1).join(", ")} y ${professionalNames.at(-1)}`;
+}
+
+function formatProfessionalAssignment(professionalNames = []) {
+  if (professionalNames.length === 0) return "Profesional a confirmar";
+  return formatProfessionalList(professionalNames);
+}
+
+function getSectionInitial(label) {
+  return String(label).trim().charAt(0).toUpperCase();
+}
+
+function getProfessionalInitials(name) {
+  return String(name)
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
 }
 
 function formatServicePrice(service) {
@@ -884,7 +1006,7 @@ function isBookableDate(date) {
   const today = new Date();
   today.setHours(12, 0, 0, 0);
   const lastDate = new Date(today);
-  lastDate.setDate(today.getDate() + 29);
+  lastDate.setDate(today.getDate() + BOOKING_WINDOW_DAYS - 1);
   return date >= today && date <= lastDate;
 }
 
@@ -892,7 +1014,7 @@ function canChangeCalendarMonth(month, direction) {
   const target = addMonths(month, direction);
   const todayMonth = startOfMonth(new Date());
   const lastDate = new Date();
-  lastDate.setDate(lastDate.getDate() + 29);
+  lastDate.setDate(lastDate.getDate() + BOOKING_WINDOW_DAYS - 1);
   const lastMonth = startOfMonth(lastDate);
   return target >= todayMonth && target <= lastMonth;
 }

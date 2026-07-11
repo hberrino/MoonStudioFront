@@ -1828,6 +1828,176 @@ summary:focus-visible {
   font-weight: 500;
 }
 
+.booking-choice-mobile {
+  display: grid;
+  gap: 1rem;
+}
+
+.booking-choice-legacy {
+  display: none;
+}
+
+.booking-choice-heading {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.booking-choice-heading > span {
+  align-items: center;
+  background: #5b4f3f;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  height: 1.8rem;
+  justify-content: center;
+  width: 1.8rem;
+}
+
+.booking-choice-heading div {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.booking-choice-heading strong {
+  color: #4f4436;
+  font-size: 0.95rem;
+}
+
+.booking-choice-heading small {
+  color: #7c7164;
+  font-size: 0.74rem;
+}
+
+.booking-sector-grid,
+.booking-professional-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.booking-choice-card {
+  background: #f5f3ee;
+  border: 1px solid rgba(207, 197, 186, 0.72);
+  border-radius: 0.65rem;
+  color: #4c463e;
+  min-width: 0;
+  text-align: left;
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.booking-choice-card.is-selected {
+  background: rgba(103, 90, 72, 0.1);
+  border-color: #675a48;
+  box-shadow: inset 0 0 0 1px #675a48;
+}
+
+.booking-sector-card,
+.booking-professional-card {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  justify-content: center;
+  min-height: 6.4rem;
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.booking-sector-card > span,
+.booking-professional-card > span {
+  align-items: center;
+  background: #e8e1d8;
+  border-radius: 50%;
+  color: #5b4f3f;
+  display: flex;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  height: 2.6rem;
+  justify-content: center;
+  width: 2.6rem;
+}
+
+.booking-sector-card strong,
+.booking-professional-card strong {
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.booking-service-card-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.booking-service-card {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.9rem;
+}
+
+.booking-service-card > span {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.booking-service-card strong {
+  font-size: 0.86rem;
+  line-height: 1.3;
+}
+
+.booking-service-card small {
+  color: #7c7164;
+  font-size: 0.7rem;
+  line-height: 1.3;
+}
+
+.booking-service-card b {
+  color: #5b4f3f;
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  max-width: 6.5rem;
+  text-align: right;
+}
+
+.booking-choice-summary {
+  background: rgba(107, 92, 76, 0.09);
+  border-left: 3px solid #675a48;
+  border-radius: 0.35rem;
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.35rem;
+  padding: 0.8rem 0.9rem;
+}
+
+.booking-choice-summary small {
+  color: #7c7164;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.booking-choice-summary strong {
+  color: #4f4436;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  .booking-choice-mobile {
+    display: none;
+  }
+
+  .booking-choice-legacy {
+    display: block;
+  }
+}
+
 .booking-select-help {
   color: #4c463e;
   font-size: 0.92rem;
@@ -1903,6 +2073,48 @@ summary:focus-visible {
   border: 1px solid rgba(207, 197, 186, 0.72);
   border-radius: 0.65rem;
   padding: 1rem;
+}
+
+.booking-date-time-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.booking-time-panel {
+  align-self: start;
+  background: rgba(245, 243, 238, 0.72);
+  border: 1px solid rgba(207, 197, 186, 0.72);
+  border-radius: 0.65rem;
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.25rem;
+}
+
+.booking-time-panel > strong {
+  color: #5b4f3f;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.15;
+  text-transform: capitalize;
+}
+
+.booking-time-panel > small {
+  color: #7c7164;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .booking-date-time-layout {
+    align-items: start;
+    grid-template-columns: minmax(0, 1.35fr) minmax(230px, 0.65fr);
+  }
+
+  .booking-time-panel {
+    margin-top: 0;
+    min-height: 100%;
+  }
 }
 
 .booking-calendar-header {
