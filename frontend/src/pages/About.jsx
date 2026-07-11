@@ -251,12 +251,7 @@ export default function About() {
   return (
     <section className="section-shell" id="nosotros">
       <div className="section-heading" data-reveal>
-        <p className="text-label uppercase text-tertiary">Nosotros</p>
-        <h2>El equipo Moon</h2>
-        <p>
-          Profesionales con una mirada calma, precisa y cercana. Estos datos son
-          inventados para que puedas reemplazarlos por el equipo real.
-        </p>
+        <h2>Equipo Moon</h2>
       </div>
 
       <div
