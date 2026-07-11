@@ -11,6 +11,7 @@ const emptyServiceForm = {
 };
 const emptyProfessionalForm = { nombre: "" };
 const emptyProfileForm = { idProfesional: "", email: "" };
+const emptyCloseDayForm = { idProfesional: "", fecha: "" };
 const emptyBlockForm = {
   fecha: "",
   horaInicio: "15:00",
@@ -68,6 +69,9 @@ export default function Admin() {
   const [serviceForm, setServiceForm] = useState(emptyServiceForm);
   const [professionalForm, setProfessionalForm] = useState(emptyProfessionalForm);
   const [profileForm, setProfileForm] = useState(emptyProfileForm);
+  const [closeDayForm, setCloseDayForm] = useState(emptyCloseDayForm);
+  const [closeDayConfirmation, setCloseDayConfirmation] = useState(null);
+  const [isClosingDay, setIsClosingDay] = useState(false);
   const [blockForm, setBlockForm] = useState(emptyBlockForm);
   const [manualTurnForm, setManualTurnForm] = useState(emptyManualTurnForm);
   const [manualTurnServices, setManualTurnServices] = useState([]);
@@ -491,6 +495,51 @@ export default function Admin() {
     }
   }
 
+  function handleCloseDaySubmit(event) {
+    event.preventDefault();
+    const professional = profesionales.find(
+      (item) => String(item.id) === closeDayForm.idProfesional,
+    );
+
+    if (!professional || !closeDayForm.fecha) return;
+
+    setCloseDayConfirmation({
+      idProfesional: professional.id,
+      profesional: professional.nombre,
+      fecha: closeDayForm.fecha,
+    });
+  }
+
+  async function handleConfirmCloseDay() {
+    if (!closeDayConfirmation) return;
+
+    try {
+      setError("");
+      setIsClosingDay(true);
+      const bloqueo = await api.createBloqueoProfesional(
+        closeDayConfirmation.idProfesional,
+        {
+          fecha: closeDayConfirmation.fecha,
+          horaInicio: "00:00",
+          horaFin: "23:59",
+          motivo: "Agenda cerrada",
+        },
+      );
+      if (String(availabilityForm.idProfesional) === String(closeDayConfirmation.idProfesional)) {
+        setBloqueos((currentBloqueos) => [bloqueo, ...currentBloqueos]);
+      }
+      setCloseDayForm(emptyCloseDayForm);
+      setCloseDayConfirmation(null);
+      setMessage(
+        `Agenda de ${closeDayConfirmation.profesional} cerrada para el ${formatDate(closeDayConfirmation.fecha)}. Los turnos existentes se conservaron.`,
+      );
+    } catch (requestError) {
+      handleAdminRequestError(requestError);
+    } finally {
+      setIsClosingDay(false);
+    }
+  }
+
   async function handleManualProfessionalChange(idProfesional) {
     setManualTurnForm((currentForm) => ({
       ...currentForm,
@@ -582,21 +631,15 @@ export default function Admin() {
           <span className="form-label">Seccion</span>
           <select
             className="form-input form-input-boxed"
-            onChange={(event) => {
-              if (event.target.value === "actualizar") {
-                refreshAdminData();
-                return;
-              }
-              setActiveTab(event.target.value);
-            }}
+            onChange={(event) => setActiveTab(event.target.value)}
             value={activeTab}
           >
             <option value="turnos">Turnos</option>
             <option value="servicios">Servicios y precios</option>
             <option value="disponibilidad">Disponibilidad</option>
-            <option value="perfil">Mi perfil</option>
+            <option value="perfil">Mi correo</option>
+            <option value="cerrar-dia">Cerrar día</option>
             <option value="agendar">Agendar turno</option>
-            <option value="actualizar">Actualizar datos</option>
           </select>
         </label>
 
@@ -627,7 +670,14 @@ export default function Admin() {
             onClick={() => setActiveTab("perfil")}
             type="button"
           >
-            Mi perfil
+            Mi correo
+          </button>
+          <button
+            className={`admin-tab ${activeTab === "cerrar-dia" ? "admin-tab-active" : ""}`}
+            onClick={() => setActiveTab("cerrar-dia")}
+            type="button"
+          >
+            Cerrar día
           </button>
           <button
             className={`admin-tab ${activeTab === "agendar" ? "admin-tab-active" : ""}`}
@@ -635,9 +685,6 @@ export default function Admin() {
             type="button"
           >
             Agendar turno
-          </button>
-          <button className="admin-tab" onClick={refreshAdminData} type="button">
-            Actualizar
           </button>
         </div>
 
@@ -1084,7 +1131,7 @@ export default function Admin() {
           </section>
         ) : activeTab === "perfil" ? (
           <section className="admin-panel mt-8">
-            <h2 className="admin-panel-title">Mi perfil</h2>
+            <h2 className="admin-panel-title">Mi correo</h2>
             <p className="mt-2 text-on-surface-variant">
               Carga el correo de cada profesional para futuras notificaciones de turnos.
             </p>
@@ -1134,6 +1181,50 @@ export default function Admin() {
               Si el correo queda vacio, el profesional seguira funcionando normalmente, solo sin
               notificaciones por mail.
             </p>
+          </section>
+        ) : activeTab === "cerrar-dia" ? (
+          <section className="admin-panel mt-8">
+            <h2 className="admin-panel-title">Cerrar día</h2>
+            <p className="mt-2 text-on-surface-variant">
+              Cerrá la agenda de una profesional para impedir nuevas reservas durante ese día.
+              Los turnos que ya existen se conservarán.
+            </p>
+            <form className="admin-close-day-form mt-6" onSubmit={handleCloseDaySubmit}>
+              <label className="block">
+                <span className="form-label">Profesional</span>
+                <select
+                  className="form-input form-input-boxed"
+                  onChange={(event) =>
+                    setCloseDayForm({ ...closeDayForm, idProfesional: event.target.value })
+                  }
+                  required
+                  value={closeDayForm.idProfesional}
+                >
+                  <option value="">Seleccionar profesional</option>
+                  {profesionales.map((professional) => (
+                    <option key={professional.id} value={professional.id}>
+                      {professional.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="form-label">Día</span>
+                <input
+                  className="form-input form-input-boxed"
+                  min={getTodayDateInputValue()}
+                  onChange={(event) =>
+                    setCloseDayForm({ ...closeDayForm, fecha: event.target.value })
+                  }
+                  required
+                  type="date"
+                  value={closeDayForm.fecha}
+                />
+              </label>
+              <button className="button-primary" type="submit">
+                Cerrar día
+              </button>
+            </form>
           </section>
         ) : (
           <section className="admin-panel mt-8">
@@ -1348,8 +1439,59 @@ export default function Admin() {
           </section>
         )}
       </div>
+
+      {closeDayConfirmation ? (
+        <div
+          aria-labelledby="close-day-confirmation-title"
+          aria-modal="true"
+          className="profile-modal-backdrop booking-confirmation-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isClosingDay) {
+              setCloseDayConfirmation(null);
+            }
+          }}
+          role="dialog"
+        >
+          <div className="booking-confirmation-modal admin-close-day-modal">
+            <p className="text-label uppercase text-tertiary">Confirmar cierre</p>
+            <h2 id="close-day-confirmation-title">¿Cerrar esta agenda?</h2>
+            <p className="booking-confirmation-note">
+              ¿Cerrar la agenda de <strong>{closeDayConfirmation.profesional}</strong> para el{" "}
+              <strong>{formatDate(closeDayConfirmation.fecha)}</strong>?
+            </p>
+            <p className="booking-confirmation-note">
+              Los turnos existentes se conservarán, pero no se podrán realizar nuevas reservas.
+            </p>
+            <div className="admin-close-day-modal-actions">
+              <button
+                className="button-secondary"
+                disabled={isClosingDay}
+                onClick={() => setCloseDayConfirmation(null)}
+                type="button"
+              >
+                Cancelar
+              </button>
+              <button
+                autoFocus
+                className="button-primary"
+                disabled={isClosingDay}
+                onClick={handleConfirmCloseDay}
+                type="button"
+              >
+                {isClosingDay ? "Cerrando..." : "Confirmar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
+}
+
+function getTodayDateInputValue() {
+  const now = new Date();
+  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return localDate.toISOString().slice(0, 10);
 }
 
 function getDayLabel(day) {

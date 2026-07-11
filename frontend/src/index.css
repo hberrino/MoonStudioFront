@@ -2409,6 +2409,28 @@ summary:focus-visible {
   max-width: 620px;
 }
 
+.admin-close-day-form {
+  align-items: end;
+  display: grid;
+  gap: 0.9rem;
+  max-width: 680px;
+}
+
+.admin-close-day-modal h2 {
+  font-size: clamp(2rem, 7vw, 3.2rem);
+}
+
+.admin-close-day-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.admin-close-day-modal-actions button {
+  min-width: 8rem;
+}
+
 .admin-list-row {
   align-items: center;
   background: #fbf9f4;
@@ -2519,6 +2541,10 @@ button:disabled {
   }
 
   .admin-profile-form {
+    max-width: none;
+  }
+
+  .admin-close-day-form {
     max-width: none;
   }
 
@@ -2641,6 +2667,10 @@ button:disabled {
 
   .admin-profile-form {
     grid-template-columns: minmax(180px, 0.8fr) minmax(220px, 1fr) auto;
+  }
+
+  .admin-close-day-form {
+    grid-template-columns: minmax(180px, 1fr) minmax(180px, 0.8fr) auto;
   }
 
   .admin-row-actions {
