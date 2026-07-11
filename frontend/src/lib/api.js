@@ -84,6 +84,8 @@ export const api = {
     }),
   getHorariosDisponibles: (id, fecha) =>
     apiFetch(`/disponibilidad/profesionales/${id}/horarios?fecha=${fecha}`),
+  getCalendarioDisponibilidad: (id, mes) =>
+    apiFetch(`/disponibilidad/profesionales/${id}/calendario?mes=${mes}`),
   getBloqueosProfesional: (id) => apiFetch(`/bloqueos/profesionales/${id}`),
   createBloqueoProfesional: (id, payload) =>
     apiFetch(`/bloqueos/profesionales/${id}`, {

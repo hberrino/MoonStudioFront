@@ -8,6 +8,7 @@ import {
   upsertDisponibilidad,
 } from "../models/disponibilidad.model.js";
 import { isValidDate, isValidTime } from "../utils/validation.js";
+import { getAvailableTimes } from "../services/availability.service.js";
 
 const diaSemanaMin = 0;
 const diaSemanaMax = 6;
@@ -112,6 +113,38 @@ export async function getHorariosDisponibles(req, res, next) {
     );
 
     return res.json(disponibles);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function getCalendarioDisponibilidad(req, res, next) {
+  try {
+    const { mes } = req.query;
+
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(String(mes))) {
+      return res.status(400).json({ message: "El mes no es valido." });
+    }
+
+    const profesional = await findProfesionalById(req.params.idProfesional);
+
+    if (!profesional) {
+      return res.status(404).json({ message: "Professional not found" });
+    }
+
+    const [year, month] = mes.split("-").map(Number);
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const dates = Array.from({ length: daysInMonth }, (_item, index) =>
+      `${year}-${String(month).padStart(2, "0")}-${String(index + 1).padStart(2, "0")}`,
+    );
+    const availability = await Promise.all(
+      dates.map(async (fecha) => ({
+        fecha,
+        disponible: (await getAvailableTimes(req.params.idProfesional, fecha)).length > 0,
+      })),
+    );
+
+    return res.json(availability);
   } catch (error) {
     return next(error);
   }

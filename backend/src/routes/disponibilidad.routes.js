@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getDisponibilidadProfesional,
+  getCalendarioDisponibilidad,
   getHorariosDisponibles,
   putDisponibilidadProfesional,
   removeDisponibilidadProfesional,
@@ -17,5 +18,6 @@ router.delete(
   removeDisponibilidadProfesional,
 );
 router.get("/profesionales/:idProfesional/horarios", getHorariosDisponibles);
+router.get("/profesionales/:idProfesional/calendario", getCalendarioDisponibilidad);
 
 export default router;

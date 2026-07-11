@@ -38,12 +38,15 @@ export default function Booking() {
   const [selectedProfesional, setSelectedProfesional] = useState("");
   const [acceptsProfessionalContact, setAcceptsProfessionalContact] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
+  const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()));
+  const [calendarAvailability, setCalendarAvailability] = useState({});
+  const [isLoadingCalendar, setIsLoadingCalendar] = useState(false);
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
   const [isLoadingHorarios, setIsLoadingHorarios] = useState(false);
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingConfirmation, setBookingConfirmation] = useState(null);
-  const dateOptions = useMemo(() => buildDateOptions(30), []);
+  const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
   const selectedServiceData = useMemo(
     () => servicios.find((service) => String(service.id) === selectedServicio) || null,
     [selectedServicio, servicios],
@@ -175,6 +178,38 @@ export default function Booking() {
       isMounted = false;
     };
   }, [selectedDate, selectedProfesional]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!selectedProfesional) {
+      return undefined;
+    }
+
+    async function loadCalendar() {
+      try {
+        setIsLoadingCalendar(true);
+        const monthKey = `${calendarMonth.getFullYear()}-${String(calendarMonth.getMonth() + 1).padStart(2, "0")}`;
+        const days = await api.getCalendarioDisponibilidad(selectedProfesional, monthKey);
+
+        if (isMounted) {
+          setCalendarAvailability(
+            Object.fromEntries(days.map((day) => [day.fecha, day.disponible])),
+          );
+        }
+      } catch {
+        if (isMounted) setCalendarAvailability({});
+      } finally {
+        if (isMounted) setIsLoadingCalendar(false);
+      }
+    }
+
+    loadCalendar();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [calendarMonth, selectedProfesional]);
 
   const visibleHorarios = selectedProfesional && selectedDate ? horariosDisponibles : [];
 
@@ -461,6 +496,8 @@ export default function Booking() {
                     onChange={(event) => {
                       setSelectedProfesional(event.target.value);
                       setSelectedDate("");
+                      setCalendarMonth(startOfMonth(new Date()));
+                      setCalendarAvailability({});
                       updateField("time", "");
                     }}
                     required
@@ -497,26 +534,65 @@ export default function Booking() {
           {currentStep === 3 ? (
             <FormGroup title="Fecha y hora">
               <div className="grid gap-6 md:grid-cols-2">
-                <label className="block">
-                  <span className="form-label">Dia</span>
-                  <select
-                    className="form-input form-input-boxed"
-                    name="date"
-                    onChange={(event) => {
-                      setSelectedDate(event.target.value);
-                      updateField("time", "");
-                    }}
-                    required
-                    value={selectedDate}
-                  >
-                    <option value="">Selecciona un dia</option>
-                    {dateOptions.map((day) => (
-                      <option key={day.value} value={day.value}>
-                        {day.label}
-                      </option>
+                <div className="booking-calendar" aria-label="Calendario de turnos">
+                  <div className="booking-calendar-header">
+                    <button
+                      aria-label="Mes anterior"
+                      disabled={!canChangeCalendarMonth(calendarMonth, -1)}
+                      onClick={() => setCalendarMonth(addMonths(calendarMonth, -1))}
+                      type="button"
+                    >
+                      ‹
+                    </button>
+                    <strong>{formatCalendarMonth(calendarMonth)}</strong>
+                    <button
+                      aria-label="Mes siguiente"
+                      disabled={!canChangeCalendarMonth(calendarMonth, 1)}
+                      onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
+                      type="button"
+                    >
+                      ›
+                    </button>
+                  </div>
+                  <div className="booking-calendar-weekdays" aria-hidden="true">
+                    {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day) => (
+                      <span key={day}>{day}</span>
                     ))}
-                  </select>
-                </label>
+                  </div>
+                  <div className="booking-calendar-grid">
+                    {calendarDays.map((day) => {
+                      const dateValue = toDateInputValue(day.date);
+                      const selectable = isBookableDate(day.date);
+                      const available = calendarAvailability[dateValue] === true;
+                      const unavailable = selectable && calendarAvailability[dateValue] === false;
+                      return (
+                        <button
+                          aria-label={`${formatBookingDate(dateValue)}${available ? ', disponible' : ', sin disponibilidad'}`}
+                          className={[
+                            'booking-calendar-day',
+                            !day.isCurrentMonth ? 'booking-calendar-day-outside' : '',
+                            available ? 'booking-calendar-day-available' : '',
+                            unavailable ? 'booking-calendar-day-unavailable' : '',
+                            selectedDate === dateValue ? 'booking-calendar-day-selected' : '',
+                          ].filter(Boolean).join(' ')}
+                          disabled={!day.isCurrentMonth || !selectable || !available || isLoadingCalendar}
+                          key={dateValue}
+                          onClick={() => {
+                            setSelectedDate(dateValue);
+                            updateField('time', '');
+                          }}
+                          type="button"
+                        >
+                          {day.date.getDate()}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="booking-calendar-legend">
+                    <span><i className="is-available" /> Disponible</span>
+                    <span><i className="is-unavailable" /> Sin horarios</span>
+                  </div>
+                </div>
                 <label className="block">
                   <span className="form-label">Horario preferido</span>
                   <select
@@ -783,24 +859,46 @@ function formatBookingDate(value) {
   }).format(date);
 }
 
-function buildDateOptions(totalDays) {
-  return Array.from({ length: totalDays }, (_item, index) => {
-    const date = new Date();
-    date.setHours(12, 0, 0, 0);
-    date.setDate(date.getDate() + index);
-    const weekday = new Intl.DateTimeFormat("es-AR", { weekday: "short" })
-      .format(date)
-      .replace(".", "");
-    const dayMonth = new Intl.DateTimeFormat("es-AR", {
-      day: "2-digit",
-      month: "2-digit",
-    }).format(date);
+function startOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1, 12);
+}
 
-    return {
-      value: toDateInputValue(date),
-      label: `${weekday} ${dayMonth}`,
-    };
+function addMonths(date, amount) {
+  return new Date(date.getFullYear(), date.getMonth() + amount, 1, 12);
+}
+
+function buildCalendarDays(month) {
+  const firstDay = startOfMonth(month);
+  const mondayOffset = (firstDay.getDay() + 6) % 7;
+  const gridStart = new Date(firstDay);
+  gridStart.setDate(firstDay.getDate() - mondayOffset);
+
+  return Array.from({ length: 42 }, (_item, index) => {
+    const date = new Date(gridStart);
+    date.setDate(gridStart.getDate() + index);
+    return { date, isCurrentMonth: date.getMonth() === month.getMonth() };
   });
+}
+
+function isBookableDate(date) {
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  const lastDate = new Date(today);
+  lastDate.setDate(today.getDate() + 29);
+  return date >= today && date <= lastDate;
+}
+
+function canChangeCalendarMonth(month, direction) {
+  const target = addMonths(month, direction);
+  const todayMonth = startOfMonth(new Date());
+  const lastDate = new Date();
+  lastDate.setDate(lastDate.getDate() + 29);
+  const lastMonth = startOfMonth(lastDate);
+  return target >= todayMonth && target <= lastMonth;
+}
+
+function formatCalendarMonth(date) {
+  return new Intl.DateTimeFormat("es-AR", { month: "long", year: "numeric" }).format(date);
 }
 
 function toDateInputValue(date) {

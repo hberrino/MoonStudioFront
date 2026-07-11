@@ -1898,6 +1898,121 @@ summary:focus-visible {
   margin-top: 2rem;
 }
 
+.booking-calendar {
+  background: #f5f3ee;
+  border: 1px solid rgba(207, 197, 186, 0.72);
+  border-radius: 0.65rem;
+  padding: 1rem;
+}
+
+.booking-calendar-header {
+  align-items: center;
+  display: grid;
+  grid-template-columns: 2.25rem 1fr 2.25rem;
+  margin-bottom: 0.85rem;
+  text-align: center;
+}
+
+.booking-calendar-header strong {
+  color: #5b4f3f;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.booking-calendar-header button {
+  border: 1px solid rgba(103, 90, 72, 0.28);
+  border-radius: 50%;
+  color: #5b4f3f;
+  font-size: 1.4rem;
+  height: 2.25rem;
+}
+
+.booking-calendar-header button:disabled {
+  opacity: 0.25;
+}
+
+.booking-calendar-weekdays,
+.booking-calendar-grid {
+  display: grid;
+  gap: 0.28rem;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.booking-calendar-weekdays {
+  color: #7c7164;
+  font-size: 0.64rem;
+  margin-bottom: 0.35rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.booking-calendar-day {
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  color: #8a8073;
+  font-size: 0.78rem;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.booking-calendar-day-available {
+  background: #dce9dc;
+  border-color: #9fbea2;
+  color: #285f38;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.booking-calendar-day-available:hover {
+  border-color: #4f8058;
+  transform: translateY(-1px);
+}
+
+.booking-calendar-day-unavailable {
+  background: #f1dcd7;
+  border-color: #d9aaa0;
+  color: #8a3e32;
+}
+
+.booking-calendar-day-selected {
+  box-shadow: 0 0 0 2px #5b4f3f;
+}
+
+.booking-calendar-day-outside {
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.booking-calendar-legend {
+  color: #675a48;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.booking-calendar-legend span {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.booking-calendar-legend i {
+  border-radius: 50%;
+  height: 0.65rem;
+  width: 0.65rem;
+}
+
+.booking-calendar-legend .is-available {
+  background: #9fbea2;
+}
+
+.booking-calendar-legend .is-unavailable {
+  background: #d9aaa0;
+}
+
 .admin-page {
   background: #fbf9f4;
   color: #1b1c19;
