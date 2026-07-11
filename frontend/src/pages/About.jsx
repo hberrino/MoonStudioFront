@@ -252,6 +252,7 @@ export default function About() {
     <section className="section-shell" id="nosotros">
       <div className="section-heading" data-reveal>
         <h2>Equipo Moon</h2>
+        <p>Conocé a quienes forman parte de Moon.</p>
       </div>
 
       <div
