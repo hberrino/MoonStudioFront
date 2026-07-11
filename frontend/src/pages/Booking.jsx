@@ -696,33 +696,37 @@ export default function Booking() {
                   </div>
                 </div>
                 <label className="booking-time-panel">
-                  <span className="text-label uppercase text-tertiary">Horario</span>
-                  <strong>
-                    {selectedDate ? formatBookingDate(selectedDate) : "Elegí un día disponible"}
-                  </strong>
-                  <span className="form-label">Horario preferido</span>
-                  <select
-                    className="form-input form-input-boxed"
-                    disabled={!selectedDate || isLoadingHorarios}
-                    id="time"
-                    name="time"
-                    onChange={(event) => updateField("time", event.target.value)}
-                    required
-                    value={formValues.time}
-                  >
-                    <option value="">
-                      {getTimePlaceholder({
-                        isLoadingHorarios,
-                        selectedDate,
-                        selectedProfesional,
-                      })}
-                    </option>
-                    {visibleHorarios.map((time) => (
-                      <option key={time} value={time}>
-                        {time}
+                  <div className="booking-time-heading">
+                    <span className="text-label uppercase text-tertiary">Horario</span>
+                    <strong>
+                      {selectedDate ? formatBookingDate(selectedDate) : "Elegí un día disponible"}
+                    </strong>
+                  </div>
+                  <div className="booking-time-control">
+                    <span className="form-label">Horario preferido</span>
+                    <select
+                      className="form-input form-input-boxed"
+                      disabled={!selectedDate || isLoadingHorarios}
+                      id="time"
+                      name="time"
+                      onChange={(event) => updateField("time", event.target.value)}
+                      required
+                      value={formValues.time}
+                    >
+                      <option value="">
+                        {getTimePlaceholder({
+                          isLoadingHorarios,
+                          selectedDate,
+                          selectedProfesional,
+                        })}
                       </option>
-                    ))}
-                  </select>
+                      {visibleHorarios.map((time) => (
+                        <option key={time} value={time}>
+                          {time}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <small>
                     Los horarios mostrados corresponden a la profesional seleccionada.
                   </small>

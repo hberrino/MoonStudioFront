@@ -2126,12 +2126,22 @@ summary:focus-visible {
   padding: 1rem;
 }
 
-.booking-time-panel > strong {
+.booking-time-heading,
+.booking-time-control {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.booking-time-heading > strong {
   color: #5b4f3f;
   font-family: var(--font-display);
   font-size: 1.3rem;
   font-weight: 500;
   line-height: 1.15;
+}
+
+.booking-time-heading > strong::first-letter {
+  text-transform: uppercase;
 }
 
 .booking-time-panel .form-label {
@@ -2152,14 +2162,18 @@ summary:focus-visible {
 
 @media (min-width: 768px) {
   .booking-date-time-layout {
-    align-items: start;
-    grid-template-columns: minmax(0, 1.35fr) minmax(230px, 0.65fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .booking-time-panel {
-    margin-top: 0;
-    max-width: 18rem;
+    align-items: end;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+    max-width: none;
     width: 100%;
+  }
+
+  .booking-time-panel > small {
+    grid-column: 1 / -1;
   }
 }
 
