@@ -50,6 +50,20 @@ export async function updateServicio(
 }
 
 export async function deleteServicio(id) {
-  const [result] = await pool.query("DELETE FROM servicios WHERE id = ?", [id]);
-  return result.affectedRows > 0;
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+    // Older databases may not cascade these assignments when deleting a service.
+    // Keep both deletions atomic so a booking restriction restores assignments.
+    await connection.query("DELETE FROM profesional_servicio WHERE id_servicio = ?", [id]);
+    const [result] = await connection.query("DELETE FROM servicios WHERE id = ?", [id]);
+    await connection.commit();
+    return result.affectedRows > 0;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 }
