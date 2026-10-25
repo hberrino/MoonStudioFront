@@ -4,6 +4,7 @@ export async function findAllServicios() {
   const [rows] = await pool.query(
     `SELECT id, nombre, seccion, precio_tipo, precio_min, precio_max, precio_min AS precio
      FROM servicios
+     WHERE eliminado = 0
      ORDER BY id`,
   );
   return rows;
@@ -13,7 +14,7 @@ export async function findServicioById(id) {
   const [rows] = await pool.query(
     `SELECT id, nombre, seccion, precio_tipo, precio_min, precio_max, precio_min AS precio
      FROM servicios
-     WHERE id = ?`,
+     WHERE id = ? AND eliminado = 0`,
     [id],
   );
   return rows[0] || null;
@@ -41,7 +42,7 @@ export async function updateServicio(
   const [result] = await pool.query(
     `UPDATE servicios
      SET nombre = ?, seccion = ?, precio_tipo = ?, precio_min = ?, precio_max = ?
-     WHERE id = ?`,
+     WHERE id = ? AND eliminado = 0`,
     [nombre, seccion, precioTipo, precioMin, precioMax, id],
   );
 
@@ -50,20 +51,10 @@ export async function updateServicio(
 }
 
 export async function deleteServicio(id) {
-  const connection = await pool.getConnection();
-
-  try {
-    await connection.beginTransaction();
-    // Older databases may not cascade these assignments when deleting a service.
-    // Keep both deletions atomic so a booking restriction restores assignments.
-    await connection.query("DELETE FROM profesional_servicio WHERE id_servicio = ?", [id]);
-    const [result] = await connection.query("DELETE FROM servicios WHERE id = ?", [id]);
-    await connection.commit();
-    return result.affectedRows > 0;
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
+  // Keep the row and its references so existing bookings retain their details.
+  const [result] = await pool.query(
+    "UPDATE servicios SET eliminado = 1 WHERE id = ? AND eliminado = 0",
+    [id],
+  );
+  return result.affectedRows > 0;
 }

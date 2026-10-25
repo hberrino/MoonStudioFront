@@ -47,7 +47,7 @@ export async function findServiciosByProfesional(idProfesional) {
     `SELECT s.id, s.nombre, s.seccion, s.precio_tipo, s.precio_min, s.precio_max, s.precio_min AS precio
      FROM servicios s
      INNER JOIN profesional_servicio ps ON ps.id_servicio = s.id
-     WHERE ps.id_profesional = ?
+     WHERE ps.id_profesional = ? AND s.eliminado = 0
      ORDER BY s.id`,
     [idProfesional],
   );
@@ -57,8 +57,9 @@ export async function findServiciosByProfesional(idProfesional) {
 export async function hasServicioAsignado(idProfesional, idServicio) {
   const [rows] = await pool.query(
     `SELECT 1
-     FROM profesional_servicio
-     WHERE id_profesional = ? AND id_servicio = ?
+     FROM profesional_servicio ps
+     INNER JOIN servicios s ON s.id = ps.id_servicio
+     WHERE ps.id_profesional = ? AND ps.id_servicio = ? AND s.eliminado = 0
      LIMIT 1`,
     [idProfesional, idServicio],
   );

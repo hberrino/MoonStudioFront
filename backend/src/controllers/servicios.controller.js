@@ -106,19 +106,6 @@ export async function removeServicio(req, res, next) {
 
     return res.status(204).send();
   } catch (error) {
-    if (error.code === "ER_ROW_IS_REFERENCED_2" && /fk_turnos_servicio/.test(error.sqlMessage || error.message || "")) {
-      return res.status(409).json({
-        message:
-          "No se puede eliminar este servicio porque tiene turnos asociados, incluidos cancelados o del historial. Podés conservarlo para mantener el historial.",
-      });
-    }
-
-    if (error.code === "ER_ROW_IS_REFERENCED_2") {
-      return res.status(409).json({
-        message: "No se puede eliminar este servicio porque tiene registros asociados.",
-      });
-    }
-
     return next(error);
   }
 }

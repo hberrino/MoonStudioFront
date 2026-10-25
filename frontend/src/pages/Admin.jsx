@@ -249,7 +249,9 @@ export default function Admin() {
   }
 
   async function handleDeleteService(service) {
-    const confirmed = window.confirm(`Eliminar el servicio "${service.nombre}"?`);
+    const confirmed = window.confirm(
+      `Eliminar el servicio "${service.nombre}" del catalogo? Los turnos existentes se conservaran.`,
+    );
 
     if (!confirmed) return;
 
@@ -264,9 +266,6 @@ export default function Admin() {
         delete nextMap[service.id];
         return nextMap;
       });
-      setTurnos((currentTurnos) =>
-        currentTurnos.filter((turno) => turno.id_servicio !== service.id),
-      );
       setMessage("Servicio eliminado.");
     } catch (requestError) {
       handleAdminRequestError(requestError);
