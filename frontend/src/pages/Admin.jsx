@@ -179,19 +179,6 @@ export default function Admin() {
     resetAdminSession();
   }
 
-  async function handleEstadoChange(turnoId, estado) {
-    try {
-      setError("");
-      const updatedTurno = await api.updateTurnoEstado(turnoId, estado);
-      setTurnos((currentTurnos) =>
-        currentTurnos.map((turno) => (turno.id === updatedTurno.id ? updatedTurno : turno)),
-      );
-      setMessage("Estado actualizado.");
-    } catch (requestError) {
-      handleAdminRequestError(requestError);
-    }
-  }
-
   async function handleDeleteTurno(turno) {
     const confirmed = window.confirm(
       `Liberar el turno de ${turno.nombre_cliente} del ${formatDate(turno.fecha)} a las ${String(turno.hora).slice(0, 5)}? Esta accion eliminara el turno definitivamente.`,
@@ -702,7 +689,6 @@ export default function Admin() {
               error={error}
               key={agendaProfessional?.id ?? "unselected"}
               onDeleteTurno={handleDeleteTurno}
-              onEstadoChange={handleEstadoChange}
               professional={agendaProfessional}
               turnos={turnos}
             />

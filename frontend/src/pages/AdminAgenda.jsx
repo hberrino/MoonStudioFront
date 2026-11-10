@@ -6,7 +6,7 @@ const monthFormat = new Intl.DateTimeFormat("es-AR", { month: "long", year: "num
 const dayFormat = new Intl.DateTimeFormat("es-AR", { dateStyle: "full" });
 const shortDateFormat = new Intl.DateTimeFormat("es-AR", { dateStyle: "short" });
 
-export default function AdminAgenda({ professional, turnos, error, onEstadoChange, onDeleteTurno }) {
+export default function AdminAgenda({ professional, turnos, error, onDeleteTurno }) {
   const [monthOffset, setMonthOffset] = useState(0);
   const [openView, setOpenView] = useState(null);
   const today = new Date();
@@ -36,7 +36,11 @@ export default function AdminAgenda({ professional, turnos, error, onEstadoChang
 
   return (
     <div className="mt-5">
-      {!professional && <p className="mb-3 text-on-surface-variant">Elegí un profesional para ver su agenda.</p>}
+      {!professional && (
+        <p className="admin-agenda-notice" role="status">
+          Seleccioná un profesional para habilitar el calendario.
+        </p>
+      )}
       <div className={`admin-agenda${professional ? "" : " admin-agenda-locked"}`}>
         <div className="admin-agenda-header">
           <button aria-label="Mes anterior" disabled={!professional || monthOffset === 0}
@@ -87,7 +91,7 @@ export default function AdminAgenda({ professional, turnos, error, onEstadoChang
               {pastTurnos.map((turno) => (
                 <li key={turno.id}>
                   {shortDateFormat.format(new Date(`${String(turno.fecha).slice(0, 10)}T12:00:00`))}
-                  {` · ${formatHours(turno)} · ${turno.nombre_cliente} · ${turno.servicio_nombre} · ${turno.estado}`}
+                  {` · ${formatHours(turno)} · ${turno.nombre_cliente} · ${turno.servicio_nombre}`}
                 </li>
               ))}
             </ul>
@@ -108,15 +112,6 @@ export default function AdminAgenda({ professional, turnos, error, onEstadoChang
                   {turno.email_cliente && <span>{turno.email_cliente}</span>}
                 </div>
                 <div className="admin-turno-actions">
-                  <label className="block">
-                    <span className="form-label">Estado</span>
-                    <select className="form-input form-input-boxed" value={turno.estado}
-                      onChange={(event) => onEstadoChange(turno.id, event.target.value)}>
-                      <option value="pendiente">Pendiente</option>
-                      <option value="confirmado">Confirmado</option>
-                      <option value="cancelado">Cancelado</option>
-                    </select>
-                  </label>
                   <button className="admin-danger-button admin-compact-button" onClick={() => onDeleteTurno(turno)} type="button">
                     Liberar turno
                   </button>
@@ -144,7 +139,9 @@ function AgendaDialog({ title, children, onClose }) {
       <div className="admin-agenda-dialog-header">
         <h3 id={titleId}>{title}</h3>
         <form method="dialog">
-          <button className="button-secondary" type="submit">Cerrar</button>
+          <button aria-label="Cerrar" className="admin-agenda-close" type="submit">
+            <span aria-hidden="true">×</span>
+          </button>
         </form>
       </div>
       {children}
