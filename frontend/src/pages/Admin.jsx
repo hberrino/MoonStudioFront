@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api.js";
+import AdminAgenda from "./AdminAgenda.jsx";
 
 const emptyServiceForm = {
   nombre: "",
@@ -77,7 +78,6 @@ export default function Admin() {
   const [manualTurnServices, setManualTurnServices] = useState([]);
   const [serviceSectionFilter, setServiceSectionFilter] = useState("");
   const [turnosProfessionalFilter, setTurnosProfessionalFilter] = useState("");
-  const [turnosTimeFilter, setTurnosTimeFilter] = useState("upcoming");
   const [availabilityForm, setAvailabilityForm] = useState({
     idProfesional: "",
     diaSemana: "1",
@@ -93,6 +93,7 @@ export default function Admin() {
     localStorage.removeItem("moon_admin_token");
     setToken("");
     setTurnos([]);
+    setTurnosProfessionalFilter("");
     setServicios([]);
     setProfesionales([]);
     setServicioProfesionales({});
@@ -115,21 +116,7 @@ export default function Admin() {
     [resetAdminSession],
   );
 
-  const sortedTurnos = useMemo(() => {
-    const now = new Date();
-    const professionalFilteredTurnos = turnosProfessionalFilter
-      ? turnos.filter((turno) => String(turno.id_profesional) === turnosProfessionalFilter)
-      : [];
-    const filteredTurnos = professionalFilteredTurnos.filter((turno) => {
-      const turnoDate = getTurnoDate(turno);
-
-      if (turnosTimeFilter === "past") return turnoDate < now;
-      if (turnosTimeFilter === "upcoming") return turnoDate >= now;
-      return true;
-    });
-
-    return [...filteredTurnos].sort(compareTurnosForAgenda);
-  }, [turnos, turnosProfessionalFilter, turnosTimeFilter]);
+  const agendaProfessional = profesionales.find(({ id }) => String(id) === turnosProfessionalFilter);
 
   const filteredServicios = useMemo(() => {
     if (!serviceSectionFilter) return servicios;
@@ -394,8 +381,7 @@ export default function Admin() {
         }));
       }
       if (turnosProfessionalFilter === String(professional.id)) {
-        const nextProfessional = profesionales.find((item) => item.id !== professional.id);
-        setTurnosProfessionalFilter(nextProfessional ? String(nextProfessional.id) : "");
+        setTurnosProfessionalFilter("");
       }
       setMessage("Profesional eliminado.");
     } catch (requestError) {
@@ -612,7 +598,7 @@ export default function Admin() {
   }
 
   return (
-    <main className="admin-page min-h-screen px-5 py-8 md:px-10">
+    <main className={`admin-page min-h-screen px-5 py-8 md:px-10${activeTab === "turnos" ? " admin-page-agenda" : ""}`}>
       <div className="mx-auto max-w-container">
         <header className="flex flex-col gap-5 border-b border-outline-variant/50 pb-6 md:flex-row md:items-center md:justify-between">
           <div>
@@ -695,97 +681,31 @@ export default function Admin() {
             <div className="admin-panel-header">
               <div>
                 <h2 className="admin-panel-title">Turnos del estudio</h2>
-                <p className="mt-2 text-on-surface-variant">
-                  Visualiza la agenda de cada profesional.
-                </p>
               </div>
-              <div className="admin-turnos-filters">
-                <label className="block">
-                  <span className="form-label">Vista</span>
-                  <select
-                    className="form-input form-input-boxed"
-                    onChange={(event) => setTurnosTimeFilter(event.target.value)}
-                    value={turnosTimeFilter}
-                  >
-                    <option value="upcoming">Proximos</option>
-                    <option value="past">Pasados</option>
-                    <option value="all">Todos</option>
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="form-label">Profesional</span>
-                  <select
-                    className="form-input form-input-boxed"
-                    onChange={(event) => setTurnosProfessionalFilter(event.target.value)}
-                    value={turnosProfessionalFilter}
-                  >
-                    <option value="">Agenda de ...</option>
-                    {profesionales.map((professional) => (
-                      <option key={professional.id} value={professional.id}>
-                        {professional.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
+              <label className="block">
+                <span className="form-label">Profesional</span>
+                <select
+                    className="form-input form-input-boxed admin-agenda-professional"
+                  onChange={(event) => setTurnosProfessionalFilter(event.target.value)}
+                  value={turnosProfessionalFilter}
+                >
+                  <option value="">Elegí un profesional</option>
+                  {profesionales.map((professional) => (
+                    <option key={professional.id} value={professional.id}>
+                      {professional.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
-            <div className="admin-turnos-list mt-5">
-              {!turnosProfessionalFilter ? (
-                <div className="admin-empty-state">
-                  <p className="text-label uppercase text-tertiary">Agenda</p>
-                  <h3>Selecciona una profesional</h3>
-                  <p>Los turnos se cargan aca cuando elegis una agenda puntual.</p>
-                </div>
-              ) : sortedTurnos.length > 0 ? (
-                sortedTurnos.map((turno) => (
-                  <article className="admin-turno" key={turno.id}>
-                    <div>
-                      <p className="text-label uppercase text-tertiary">{turno.estado}</p>
-                      <div className="admin-turno-date">
-                        <span>{formatWeekday(turno.fecha)}</span>
-                        <strong>{formatDate(turno.fecha)}</strong>
-                      </div>
-                      <p className="admin-turno-hour">
-                        {String(turno.hora).slice(0, 5)}
-                        {turno.hora_fin ? ` a ${String(turno.hora_fin).slice(0, 5)}` : ""} hs
-                      </p>
-                      <p className="mt-2 text-base font-medium text-primary">
-                        {turno.nombre_cliente}
-                      </p>
-                    </div>
-                    <div className="admin-turno-details">
-                      <span>{turno.servicio_nombre}</span>
-                      <span>{turno.profesional_nombre}</span>
-                      <span>{turno.telefono_cliente}</span>
-                      <span>{turno.email_cliente}</span>
-                    </div>
-                    <div className="admin-turno-actions">
-                      <label className="block">
-                        <span className="form-label">Estado</span>
-                        <select
-                          className="form-input form-input-boxed"
-                          onChange={(event) => handleEstadoChange(turno.id, event.target.value)}
-                          value={turno.estado}
-                        >
-                          <option value="pendiente">Pendiente</option>
-                          <option value="confirmado">Confirmado</option>
-                          <option value="cancelado">Cancelado</option>
-                        </select>
-                      </label>
-                      <button
-                        className="admin-danger-button admin-compact-button"
-                        onClick={() => handleDeleteTurno(turno)}
-                        type="button"
-                      >
-                        Liberar turno
-                      </button>
-                    </div>
-                  </article>
-                ))
-              ) : (
-                <p className="text-on-surface-variant">Todavia no hay turnos cargados.</p>
-              )}
-            </div>
+            <AdminAgenda
+              error={error}
+              key={agendaProfessional?.id ?? "unselected"}
+              onDeleteTurno={handleDeleteTurno}
+              onEstadoChange={handleEstadoChange}
+              professional={agendaProfessional}
+              turnos={turnos}
+            />
           </section>
         ) : activeTab === "servicios" ? (
           <section className="admin-grid mt-8">
@@ -1567,35 +1487,4 @@ function formatDate(value) {
     month: "2-digit",
     year: "numeric",
   }).format(new Date(`${dateOnly}T12:00:00`));
-}
-
-function formatWeekday(value) {
-  if (!value) return "";
-  const dateOnly = String(value).split("T")[0];
-  return new Intl.DateTimeFormat("es-AR", { weekday: "long" }).format(
-    new Date(`${dateOnly}T12:00:00`),
-  );
-}
-
-function compareTurnosForAgenda(a, b) {
-  const now = new Date();
-  const dateA = getTurnoDate(a);
-  const dateB = getTurnoDate(b);
-  const rankA = getTurnoAgendaRank(a, dateA, now);
-  const rankB = getTurnoAgendaRank(b, dateB, now);
-
-  if (rankA !== rankB) return rankA - rankB;
-  return dateA - dateB;
-}
-
-function getTurnoAgendaRank(turno, date, now) {
-  if (date < now) return 3;
-  if (turno.estado === "cancelado") return 2;
-  return 1;
-}
-
-function getTurnoDate(turno) {
-  const dateOnly = String(turno.fecha).split("T")[0];
-  const timeOnly = String(turno.hora || "00:00").slice(0, 5);
-  return new Date(`${dateOnly}T${timeOnly}:00`);
 }
